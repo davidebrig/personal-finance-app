@@ -298,7 +298,7 @@
 
     <script>
         // CONFIGURAZIONE - Inserisci qui l'URL del tuo Google Apps Script
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzx6GhvU0hpgimR_WkVozlWjhHiDPIdPV-A-1uURLEZryZNjocKltSaCrgjgT2VLC26/exec';
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby_KDhpaaewn1t5tBnU3qZ0mcsxbiz2FFOb7uCt1YG7pOhI-l7MVhfXyacCFNlvpFwM/exec';
         
         // Dati caricati dal Google Sheet
         let datiSpreadsheet = {
@@ -341,24 +341,36 @@
             // Mostra indicatore di caricamento
             mostraMessaggio('loading', 'Caricamento dati...');
             
-            fetch(GOOGLE_APPS_SCRIPT_URL + '?action=getInitialData')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        datiSpreadsheet = data.data;
-                        popolaSelectConti();
-                        popolaSelectCategorie();
-                        nascondiMessaggio();
-                    } else {
-                        throw new Error(data.error || 'Errore nel caricamento dati');
-                    }
-                })
-                .catch(error => {
-                    console.error('Errore:', error);
-                    mostraMessaggio('error', 'Errore nel caricamento dati: ' + error.message);
-                    // Fallback ai dati di esempio
+            // Usa GET invece di POST per il caricamento iniziale
+            fetch(GOOGLE_APPS_SCRIPT_URL + '?action=getInitialData', {
+                method: 'GET',
+                mode: 'cors'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    datiSpreadsheet = data.data;
+                    popolaSelectConti();
+                    popolaSelectCategorie();
+                    nascondiMessaggio();
+                } else {
+                    throw new Error(data.error || 'Errore nel caricamento dati');
+                }
+            })
+            .catch(error => {
+                console.error('Errore:', error);
+                mostraMessaggio('error', 'Errore nel caricamento dati. Uso dati di esempio.');
+                // Fallback ai dati di esempio
+                setTimeout(() => {
                     usaDatiEsempio();
-                });
+                    nascondiMessaggio();
+                }, 2000);
+            });
         }
 
         function popolaSelectConti() {
@@ -526,12 +538,19 @@
             
             fetch(GOOGLE_APPS_SCRIPT_URL, {
                 method: 'POST',
+                mode: 'cors',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(payload),
+                redirect: 'follow'
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     mostraMessaggio('success', data.message || 'Transazione registrata con successo!');
@@ -544,6 +563,8 @@
             .catch(error => {
                 console.error('Errore nella registrazione:', error);
                 mostraMessaggio('error', 'Errore nella registrazione: ' + error.message);
+                // Mostra anche i dati in console per debug
+                console.log('Dati che stavano per essere inviati:', transazioni);
             });
         }
 
