@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Transazioni</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2196F3, #21CBF3);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafbfc;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #2196F3;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+            transform: translateY(-1px);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .tipo-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .tipo-btn {
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            background: #fafbfc;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .tipo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .tipo-btn.active {
+            background: #2196F3;
+            color: white;
+            border-color: #2196F3;
+        }
+
+        .tipo-btn.spesa.active {
+            background: #f44336;
+            border-color: #f44336;
+        }
+
+        .tipo-btn.entrata.active {
+            background: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .tipo-btn.trasferimento.active {
+            background: #FF9800;
+            border-color: #FF9800;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #2196F3, #21CBF3);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(33, 150, 243, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .success-message {
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .error-message {
+            background: #f44336;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tipo-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                margin: 10px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Gestione Transazioni</h1>
+            <p>Registra le tue spese, entrate e trasferimenti</p>
+        </div>
+
+        <div class="form-container">
+            <form id="transactionForm">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Tipo di Transazione</label>
+                        <div class="tipo-buttons">
+                            <div class="tipo-btn spesa" data-tipo="spesa">
+                                📤 Spesa
+                            </div>
+                            <div class="tipo-btn entrata" data-tipo="entrata">
+                                📥 Entrata
+                            </div>
+                            <div class="tipo-btn trasferimento" data-tipo="trasferimento">
+                                🔄 Trasferimento
+                            </div>
+                        </div>
+                        <input type="hidden" id="tipo" name="tipo" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="importo">Importo (€)</label>
+                        <input type="number" id="importo" name="importo" step="0.01" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="data">Data</label>
+                        <input type="date" id="data" name="data" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="categoria">Categoria</label>
+                        <select id="categoria" name="categoria" required>
+                            <option value="">Seleziona categoria...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sottocategoria">Sottocategoria</label>
+                        <select id="sottocategoria" name="sottocategoria">
+                            <option value="">Seleziona sottocategoria...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="conto">Conto</label>
+                        <select id="conto" name="conto" required>
+                            <option value="">Seleziona conto...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="contoDestinazioneGroup">
+                        <label for="contoDestinazione">Conto Destinazione</label>
+                        <select id="contoDestinazione" name="contoDestinazione">
+                            <option value="">Seleziona conto destinazione...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="etichetta">Etichetta</label>
+                        <input type="text" id="etichetta" name="etichetta">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="descrizione">Descrizione</label>
+                        <textarea id="descrizione" name="descrizione" placeholder="Inserisci una descrizione dettagliata..."></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    ✨ Registra Transazione
+                </button>
+            </form>
+
+            <div id="successMessage" class="success-message">
+                Transazione registrata con successo!
+            </div>
+
+            <div id="errorMessage" class="error-message">
+                Errore durante la registrazione della transazione.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURAZIONE - Inserisci qui l'URL del tuo Google Apps Script
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyVrQwcIvzytAg6cLnFs89h1OyylJ0EvldWs_U_FC670Ur-V70Gt4-tt_Hl8hkNhlWA/exec';
+        
+        // Dati caricati dal Google Sheet
+        let datiSpreadsheet = {
+            conti: [],
+            categorie: []
+        };
+
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', function() {
+            inizializzaForm();
+            caricaDatiSpreadsheet();
+        });
+
+        function inizializzaForm() {
+            // Imposta data corrente
+            document.getElementById('data').valueAsDate = new Date();
+
+            // Gestione tipo transazione
+            const tipoBtns = document.querySelectorAll('.tipo-btn');
+            tipoBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    tipoBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById('tipo').value = this.dataset.tipo;
+                    aggiornaVisibilitaCampi();
+                });
+            });
+
+            // Gestione categoria/sottocategoria
+            document.getElementById('categoria').addEventListener('change', aggiornasottocategorie);
+
+            // Gestione form submit
+            document.getElementById('transactionForm').addEventListener('submit', gestisciSubmit);
+
+            // Nascondi conto destinazione inizialmente
+            aggiornaVisibilitaCampi();
+        }
+
+        function caricaDatiSpreadsheet() {
+            // Mostra indicatore di caricamento
+            mostraMessaggio('loading', 'Caricamento dati...');
+            
+            fetch(GOOGLE_APPS_SCRIPT_URL + '?action=getInitialData')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        datiSpreadsheet = data.data;
+                        popolaSelectConti();
+                        popolaSelectCategorie();
+                        nascondiMessaggio();
+                    } else {
+                        throw new Error(data.error || 'Errore nel caricamento dati');
+                    }
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    mostraMessaggio('error', 'Errore nel caricamento dati: ' + error.message);
+                    // Fallback ai dati di esempio
+                    usaDatiEsempio();
+                });
+        }
+
+        function popolaSelectConti() {
+            const selectConto = document.getElementById('conto');
+            const selectContoDestinazione = document.getElementById('contoDestinazione');
+            
+            // Pulisci le opzioni esistenti (tranne la prima)
+            selectConto.innerHTML = '<option value="">Seleziona conto...</option>';
+            selectContoDestinazione.innerHTML = '<option value="">Seleziona conto destinazione...</option>';
+            
+            datiSpreadsheet.conti.forEach(conto => {
+                const option1 = new Option(`${conto.nome} (€${conto.saldo || 0})`, conto.nome);
+                const option2 = new Option(`${conto.nome} (€${conto.saldo || 0})`, conto.nome);
+                selectConto.add(option1);
+                selectContoDestinazione.add(option2);
+            });
+        }
+
+        function popolaSelectCategorie() {
+            const categorie = [...new Set(datiSpreadsheet.categorie.map(c => c.categoria))];
+            const selectCategoria = document.getElementById('categoria');
+            
+            // Pulisci le opzioni esistenti (tranne la prima)
+            selectCategoria.innerHTML = '<option value="">Seleziona categoria...</option>';
+            
+            categorie.forEach(categoria => {
+                const option = new Option(categoria, categoria);
+                selectCategoria.add(option);
+            });
+        }
+
+        function usaDatiEsempio() {
+            // Dati di fallback in caso di errore di connessione
+            datiSpreadsheet = {
+                conti: [
+                    { nome: "Conto Corrente Principale", saldo: 1500 },
+                    { nome: "Conto Risparmio", saldo: 5000 },
+                    { nome: "Carta Prepagata", saldo: 200 },
+                    { nome: "Portafoglio", saldo: 50 }
+                ],
+                categorie: [
+                    { categoria: "Alimentari", tipo: "Spesa", sottocategoria: "Supermercato", classe: "Necessario" },
+                    { categoria: "Alimentari", tipo: "Spesa", sottocategoria: "Ristorante", classe: "Discrezionale" },
+                    { categoria: "Trasporti", tipo: "Spesa", sottocategoria: "Benzina", classe: "Necessario" },
+                    { categoria: "Stipendio", tipo: "Entrata", sottocategoria: "Lavoro Principale", classe: "Fisso" },
+                    { categoria: "Casa", tipo: "Spesa", sottocategoria: "Affitto", classe: "Necessario" }
+                ]
+            };
+            popolaSelectConti();
+            popolaSelectCategorie();
+        }
+
+        function aggiornaVisibilitaCampi() {
+            const tipo = document.getElementById('tipo').value;
+            const contoDestinazioneGroup = document.getElementById('contoDestinazioneGroup');
+            const contoDestinazione = document.getElementById('contoDestinazione');
+
+            if (tipo === 'trasferimento') {
+                contoDestinazioneGroup.classList.remove('hidden');
+                contoDestinazione.required = true;
+            } else {
+                contoDestinazioneGroup.classList.add('hidden');
+                contoDestinazione.required = false;
+                contoDestinazione.value = '';
+            }
+        }
+
+        function aggiornasottocategorie() {
+            const categoriaSelezionata = document.getElementById('categoria').value;
+            const selectSottocategoria = document.getElementById('sottocategoria');
+            
+            // Pulisci sottocategorie
+            selectSottocategoria.innerHTML = '<option value="">Seleziona sottocategoria...</option>';
+
+            if (categoriaSelezionata) {
+                const sottocategorie = datiSpreadsheet.categorie
+                    .filter(c => c.categoria === categoriaSelezionata)
+                    .map(c => c.sottocategoria);
+
+                sottocategorie.forEach(sottocategoria => {
+                    const option = new Option(sottocategoria, sottocategoria);
+                    selectSottocategoria.add(option);
+                });
+            }
+        }
+
+        function gestisciSubmit(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const dati = Object.fromEntries(formData.entries());
+            
+            try {
+                const transazioni = creaTransazioni(dati);
+                registraTransazioni(transazioni);
+                mostraMessaggio('success');
+                e.target.reset();
+                document.querySelectorAll('.tipo-btn').forEach(btn => btn.classList.remove('active'));
+                document.getElementById('data').valueAsDate = new Date();
+                aggiornaVisibilitaCampi();
+            } catch (error) {
+                console.error('Errore:', error);
+                mostraMessaggio('error');
+            }
+        }
+
+        function creaTransazioni(dati) {
+            const transazioni = [];
+            const importoBase = parseFloat(dati.importo);
+            
+            const transazioneBase = {
+                Data: dati.data,
+                Categoria: dati.categoria,
+                Descrizione: dati.descrizione,
+                Etichetta: dati.etichetta
+            };
+
+            if (dati.tipo === 'spesa') {
+                transazioni.push({
+                    Tipo: 'Spesa',
+                    Conto: dati.conto,
+                    'Conto Destinazione': '',
+                    'Importo (€)': -importoBase,
+                    ...transazioneBase
+                });
+            } else if (dati.tipo === 'entrata') {
+                transazioni.push({
+                    Tipo: 'Entrata',
+                    Conto: dati.conto,
+                    'Conto Destinazione': '',
+                    'Importo (€)': importoBase,
+                    ...transazioneBase
+                });
+            } else if (dati.tipo === 'trasferimento') {
+                // Transazione di uscita
+                transazioni.push({
+                    Tipo: 'Trasferimento',
+                    Conto: dati.conto,
+                    'Conto Destinazione': dati.contoDestinazione,
+                    'Importo (€)': -importoBase,
+                    ...transazioneBase
+                });
+                
+                // Transazione di entrata
+                transazioni.push({
+                    Tipo: 'Trasferimento',
+                    Conto: dati.contoDestinazione,
+                    'Conto Destinazione': dati.conto,
+                    'Importo (€)': importoBase,
+                    ...transazioneBase
+                });
+            }
+
+            return transazioni;
+        }
+
+        function registraTransazioni(transazioni) {
+            // Mostra indicatore di caricamento
+            mostraMessaggio('loading', 'Registrazione in corso...');
+            
+            const payload = {
+                action: 'addTransaction',
+                transactions: transazioni
+            };
+            
+            fetch(GOOGLE_APPS_SCRIPT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    mostraMessaggio('success', data.message || 'Transazione registrata con successo!');
+                    // Ricarica i dati per aggiornare i saldi
+                    setTimeout(() => caricaDatiSpreadsheet(), 1000);
+                } else {
+                    throw new Error(data.error || 'Errore sconosciuto');
+                }
+            })
+            .catch(error => {
+                console.error('Errore nella registrazione:', error);
+                mostraMessaggio('error', 'Errore nella registrazione: ' + error.message);
+            });
+        }
+
+        function mostraMessaggio(tipo, messaggio = '') {
+            const successMsg = document.getElementById('successMessage');
+            const errorMsg = document.getElementById('errorMessage');
+            
+            // Nascondi tutti i messaggi
+            successMsg.style.display = 'none';
+            errorMsg.style.display = 'none';
+            
+            if (tipo === 'success') {
+                successMsg.textContent = messaggio || 'Transazione registrata con successo!';
+                successMsg.style.display = 'block';
+                setTimeout(() => successMsg.style.display = 'none', 5000);
+            } else if (tipo === 'error') {
+                errorMsg.textContent = messaggio || 'Errore durante la registrazione della transazione.';
+                errorMsg.style.display = 'block';
+                setTimeout(() => errorMsg.style.display = 'none', 8000);
+            } else if (tipo === 'loading') {
+                successMsg.textContent = messaggio || 'Caricamento...';
+                successMsg.style.background = '#2196F3';
+                successMsg.style.display = 'block';
+            }
+        }
+
+        function nascondiMessaggio() {
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        // Rimuovi le funzioni non più necessarie
+        // appendRowToSheet e getSheetData sono ora gestite da Google Apps Script
+    </script>
+</body>
+</html>
