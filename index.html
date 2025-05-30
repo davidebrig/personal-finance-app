@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestione Transazioni</title>
+    <title>Finance App</title>
     <style>
         * {
             margin: 0;
@@ -12,196 +12,574 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            line-height: 1.4;
             min-height: 100vh;
-            padding: 20px;
+            padding-bottom: 80px; /* Spazio per bottom nav */
         }
 
         .container {
-            max-width: 800px;
+            max-width: 400px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            padding: 16px 8px;
         }
 
         .header {
-            background: linear-gradient(135deg, #2196F3, #21CBF3);
-            color: white;
-            padding: 30px;
             text-align: center;
+            margin-bottom: 20px;
+            padding-top: 8px;
         }
 
         .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            font-weight: 300;
-        }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1rem;
-        }
-
-        .form-container {
-            padding: 40px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            position: relative;
-        }
-
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
+            font-size: 24px;
             font-weight: 600;
-            color: #333;
-            font-size: 0.95rem;
+            margin-bottom: 4px;
         }
 
-        input, select, textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e1e8ed;
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: #fafbfc;
+        .header .status {
+            font-size: 12px;
+            color: #666;
+            padding: 4px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            background: #f5f5f5;
         }
 
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #2196F3;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
-            transform: translateY(-1px);
+        /* Pages */
+        .page {
+            display: none;
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 100px;
+        .page.active {
+            display: block;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-top: 1px solid #e5e5e5;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #666;
+            transition: color 0.2s ease;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            min-width: 60px;
+        }
+
+        .nav-item.active {
+            color: #000000;
+            background: #f5f5f5;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Dashboard Styles */
+        .dashboard-grid {
+            display: grid;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #000;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #000000, #333333);
+            color: #ffffff;
+            border: none;
+        }
+
+        .balance-amount {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .balance-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .accounts-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .account-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .account-item:last-child {
+            border-bottom: none;
+        }
+
+        .account-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .account-balance {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .account-balance.positive {
+            color: #10b981;
+        }
+
+        .account-balance.negative {
+            color: #ef4444;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 200px;
+            background: #fafafa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        .chart-placeholder {
+            text-align: center;
+        }
+
+        /* Recent Transactions */
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-left {
+            flex: 1;
+        }
+
+        .transaction-description {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .transaction-category {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .transaction-amount {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .transaction-amount.expense {
+            color: #ef4444;
+        }
+
+        .transaction-amount.income {
+            color: #10b981;
+        }
+
+        /* Transaction Form Styles (copiato dal form precedente) */
+        .form-container {
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .tipo-group {
+            margin-bottom: 20px;
         }
 
         .tipo-buttons {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 8px;
+            gap: 8px;
         }
 
         .tipo-btn {
-            padding: 12px;
-            border: 2px solid #e1e8ed;
-            background: #fafbfc;
-            border-radius: 10px;
+            padding: 12px 8px;
+            border: 1px solid #ddd;
+            background: #ffffff;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             text-align: center;
-            font-weight: 600;
+            font-size: 14px;
+            font-weight: 500;
         }
 
         .tipo-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-color: #000;
         }
 
-        .tipo-btn.active {
-            background: #2196F3;
-            color: white;
-            border-color: #2196F3;
+        .tipo-btn.active.spesa {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
         }
 
-        .tipo-btn.spesa.active {
-            background: #f44336;
-            border-color: #f44336;
+        .tipo-btn.active.entrata {
+            background: #10b981;
+            color: #ffffff;
+            border-color: #10b981;
         }
 
-        .tipo-btn.entrata.active {
-            background: #4CAF50;
-            border-color: #4CAF50;
+        .tipo-btn.active.trasferimento {
+            background: #374151;
+            color: #ffffff;
+            border-color: #374151;
         }
 
-        .tipo-btn.trasferimento.active {
-            background: #FF9800;
-            border-color: #FF9800;
+        .importo-group {
+            margin-bottom: 24px;
+        }
+
+        .importo-label {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .importo-input {
+            width: 100%;
+            padding: 16px 12px;
+            font-size: 28px;
+            font-weight: 600;
+            border: 2px solid #000000;
+            border-radius: 8px;
+            text-align: center;
+            background: #ffffff;
+        }
+
+        .importo-input:focus {
+            outline: none;
+            border-color: #000000;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            background: #ffffff;
+            transition: border-color 0.2s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #000000;
+        }
+
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23000" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 12px;
+            padding-right: 32px;
         }
 
         .hidden {
             display: none !important;
         }
 
-        .submit-btn {
-            background: linear-gradient(135deg, #2196F3, #21CBF3);
-            color: white;
+        .tags-container {
+            position: relative;
+        }
+
+        .tags-display {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 8px;
+            min-height: 40px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #fafafa;
+            align-items: center;
+        }
+
+        .tag {
+            background: #000000;
+            color: #ffffff;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tag-remove {
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 4px;
+        }
+
+        .tag-remove:hover {
+            color: #ff6b6b;
+        }
+
+        .tags-input {
+            flex: 1;
             border: none;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-size: 1.1rem;
+            outline: none;
+            background: transparent;
+            font-size: 14px;
+            min-width: 100px;
+            padding: 4px;
+        }
+
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .autocomplete-suggestion {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        .autocomplete-suggestion:hover,
+        .autocomplete-suggestion.selected {
+            background: #f5f5f5;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: #ef4444;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            margin-top: 20px;
+            transition: all 0.2s ease;
+            margin-top: 8px;
         }
 
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(33, 150, 243, 0.3);
+        .submit-btn.spesa {
+            background: #ef4444;
         }
 
-        .submit-btn:active {
-            transform: translateY(0);
+        .submit-btn.entrata {
+            background: #10b981;
         }
 
-        .success-message {
-            background: #4CAF50;
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
+        .submit-btn.trasferimento {
+            background: #374151;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+
+        .submit-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 16px;
             text-align: center;
+            font-size: 14px;
             display: none;
         }
 
-        .error-message {
-            background: #f44336;
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            text-align: center;
-            display: none;
+        .message.success {
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            color: #0c4a6e;
         }
 
-        @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .tipo-buttons {
-                grid-template-columns: 1fr;
-            }
-            
+        .message.error {
+            background: #fef2f2;
+            border: 1px solid #ef4444;
+            color: #991b1b;
+        }
+
+        .message.loading {
+            background: #fafafa;
+            border: 1px solid #d4d4d4;
+            color: #525252;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ddd;
+            border-top: 2px solid #000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+
+        .status-dot.loading {
+            background: #fbbf24;
+            animation: pulse 1.5s infinite;
+        }
+
+        .status-dot.success {
+            background: #10b981;
+        }
+
+        .status-dot.error {
+            background: #ef4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Loading Skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .skeleton-text {
+            height: 16px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .skeleton-amount {
+            height: 28px;
+            border-radius: 6px;
+            width: 60%;
+        }
+
+        /* Responsive */
+        @media (min-width: 480px) {
             .container {
-                margin: 10px;
+                max-width: 480px;
+                padding: 20px 16px;
             }
             
             .form-container {
-                padding: 20px;
+                padding: 24px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 600px;
+            }
+            
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
@@ -209,17 +587,63 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>💰 Gestione Transazioni</h1>
-            <p>Registra le tue spese, entrate e trasferimenti</p>
+            <h1 id="pageTitle">💰 Dashboard</h1>
+            <div class="status" id="connectionStatus">
+                <span class="status-dot loading"></span>
+                Connessione...
+            </div>
         </div>
 
-        <div class="form-container">
-            <form id="transactionForm">
-                <div class="form-grid">
-                    <div class="form-group full-width">
-                        <label>Tipo di Transazione</label>
+        <!-- Dashboard Page -->
+        <div id="dashboardPage" class="page active">
+            <div class="dashboard-grid">
+                <!-- Saldo Totale -->
+                <div class="card balance-card">
+                    <div class="balance-amount" id="totalBalance">€ 0,00</div>
+                    <div class="balance-label">Saldo Totale</div>
+                </div>
+
+                <!-- Lista Conti -->
+                <div class="card">
+                    <div class="card-title">📊 I tuoi conti</div>
+                    <div class="accounts-list" id="accountsList">
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text"></div>
+                    </div>
+                </div>
+
+                <!-- Grafico Spese -->
+                <div class="card">
+                    <div class="card-title">📈 Ultime spese</div>
+                    <div class="chart-container" id="expensesChart">
+                        <div class="chart-placeholder">
+                            <div>📊</div>
+                            <div>Caricamento grafico...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transazioni Recenti -->
+                <div class="card">
+                    <div class="card-title">🕒 Transazioni recenti</div>
+                    <div id="recentTransactions">
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transaction Page (stesso form di prima) -->
+        <div id="transactionPage" class="page">
+            <div class="form-container">
+                <form id="transactionForm">
+                    <!-- Tipo transazione -->
+                    <div class="tipo-group">
                         <div class="tipo-buttons">
-                            <div class="tipo-btn spesa" data-tipo="spesa">
+                            <div class="tipo-btn active spesa" data-tipo="spesa">
                                 📤 Spesa
                             </div>
                             <div class="tipo-btn entrata" data-tipo="entrata">
@@ -229,12 +653,73 @@
                                 🔄 Trasferimento
                             </div>
                         </div>
-                        <input type="hidden" id="tipo" name="tipo" required>
+                        <input type="hidden" id="tipo" name="tipo" value="spesa">
+                    </div>
+
+                    <!-- Importo - campo principale -->
+                    <div class="importo-group">
+                        <label class="importo-label" for="importo">Importo €</label>
+                        <input type="number" 
+                               id="importo" 
+                               name="importo" 
+                               class="importo-input"
+                               step="0.01" 
+                               min="0" 
+                               placeholder="0,00"
+                               inputmode="decimal"
+                               required>
+                    </div>
+
+                    <!-- Campi secondari -->
+                    <div class="form-group">
+                        <label for="conto">Conto</label>
+                        <select id="conto" name="conto" required>
+                            <option value="">📡 Caricamento...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group hidden" id="contoDestinazioneGroup">
+                        <label for="contoDestinazione">Conto destinazione</label>
+                        <select id="contoDestinazione" name="contoDestinazione">
+                            <option value="">Seleziona destinazione...</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="importo">Importo (€)</label>
-                        <input type="number" id="importo" name="importo" step="0.01" min="0" required>
+                        <label for="categoria">Categoria</label>
+                        <select id="categoria" name="categoria" required>
+                            <option value="">📡 Caricamento...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sottocategoria">Sottocategoria</label>
+                        <select id="sottocategoria" name="sottocategoria">
+                            <option value="">Prima seleziona la categoria</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group autocomplete-container">
+                        <label for="descrizione">Descrizione</label>
+                        <input type="text" 
+                               id="descrizione" 
+                               name="descrizione" 
+                               placeholder="Inizia a scrivere..."
+                               autocomplete="off">
+                        <div id="descrizioneSuggestions" class="autocomplete-suggestions"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Etichette</label>
+                        <div class="tags-container">
+                            <div class="tags-display" id="tagsDisplay">
+                                <input type="text" 
+                                       class="tags-input" 
+                                       id="tagsInput" 
+                                       placeholder="Aggiungi etichetta e premi Invio">
+                            </div>
+                            <input type="hidden" id="etichetta" name="etichetta">
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -242,79 +727,144 @@
                         <input type="date" id="data" name="data" required>
                     </div>
 
-                    <div class="form-group">
-                        <label for="categoria">Categoria</label>
-                        <select id="categoria" name="categoria" required>
-                            <option value="">Seleziona categoria...</option>
-                        </select>
-                    </div>
+                    <button type="submit" class="submit-btn spesa" id="submitBtn">
+                        <span id="submitText">Salva</span>
+                        <span id="submitSpinner" class="spinner" style="display: none;"></span>
+                    </button>
+                </form>
 
-                    <div class="form-group">
-                        <label for="sottocategoria">Sottocategoria</label>
-                        <select id="sottocategoria" name="sottocategoria">
-                            <option value="">Seleziona sottocategoria...</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="conto">Conto</label>
-                        <select id="conto" name="conto" required>
-                            <option value="">Seleziona conto...</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group" id="contoDestinazioneGroup">
-                        <label for="contoDestinazione">Conto Destinazione</label>
-                        <select id="contoDestinazione" name="contoDestinazione">
-                            <option value="">Seleziona conto destinazione...</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="etichetta">Etichetta</label>
-                        <input type="text" id="etichetta" name="etichetta">
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="descrizione">Descrizione</label>
-                        <textarea id="descrizione" name="descrizione" placeholder="Inserisci una descrizione dettagliata..."></textarea>
-                    </div>
-                </div>
-
-                <button type="submit" class="submit-btn">
-                    ✨ Registra Transazione
-                </button>
-            </form>
-
-            <div id="successMessage" class="success-message">
-                Transazione registrata con successo!
-            </div>
-
-            <div id="errorMessage" class="error-message">
-                Errore durante la registrazione della transazione.
+                <div id="message" class="message"></div>
             </div>
         </div>
     </div>
 
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active" data-page="dashboard">
+            <div class="nav-icon">📊</div>
+            <div class="nav-label">Dashboard</div>
+        </div>
+        <div class="nav-item" data-page="transaction">
+            <div class="nav-icon">💰</div>
+            <div class="nav-label">Transazioni</div>
+        </div>
+        <div class="nav-item" data-page="reports">
+            <div class="nav-icon">📈</div>
+            <div class="nav-label">Report</div>
+        </div>
+        <div class="nav-item" data-page="settings">
+            <div class="nav-icon">⚙️</div>
+            <div class="nav-label">Impostazioni</div>
+        </div>
+    </div>
+
     <script>
-        // CONFIGURAZIONE - Inserisci qui l'URL del tuo Google Apps Script
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby_KDhpaaewn1t5tBnU3qZ0mcsxbiz2FFOb7uCt1YG7pOhI-l7MVhfXyacCFNlvpFwM/exec';
+        // URL del Google Apps Script
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyB5vIdlvg42PPAX-V-AiRbRSVGIBRKLAZeYY2tH6fJI1HRPuPglHpcc0PQfyuMwQyl/exec';
         
-        // Dati caricati dal Google Sheet
         let datiSpreadsheet = {
             conti: [],
-            categorie: []
+            categorie: [],
+            transazioni: []
         };
+
+        // Suggerimenti per l'autocomplete della descrizione
+        const suggerimentiDescrizione = [
+            'Supermercato', 'Benzina', 'Ristorante', 'Bar', 'Farmacia', 'Trasporti pubblici',
+            'Abbonamento', 'Bolletta', 'Affitto', 'Spesa alimentare', 'Caffè', 'Pranzo',
+            'Cena', 'Colazione', 'Spesa casa', 'Medicina', 'Taxi', 'Parcheggio',
+            'Cinema', 'Libro', 'Abbigliamento', 'Sport', 'Palestra', 'Parrucchiere'
+        ];
+
+        // Tag system
+        let tags = [];
+
+        // Pagina corrente
+        let currentPage = 'dashboard';
 
         // Inizializzazione
         document.addEventListener('DOMContentLoaded', function() {
-            inizializzaForm();
+            inizializzaApp();
             caricaDatiSpreadsheet();
         });
 
-        function inizializzaForm() {
+        function inizializzaApp() {
+            // Inizializza navigazione
+            inizializzaNavigazione();
+            
+            // Inizializza form transazioni
+            inizializzaFormTransazioni();
+        }
+
+        function inizializzaNavigazione() {
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const page = this.dataset.page;
+                    if (page && page !== 'reports' && page !== 'settings') { // Solo pagine implementate
+                        cambiaPage(page);
+                    }
+                });
+            });
+        }
+
+        function cambiaPage(page) {
+            // Nascondi tutte le pagine
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            
+            // Rimuovi active da tutti i nav items
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            // Mostra la pagina richiesta
+            const targetPage = document.getElementById(page + 'Page');
+            if (targetPage) {
+                targetPage.classList.add('active');
+                currentPage = page;
+                
+                // Aggiorna nav item attivo
+                const navItem = document.querySelector(`[data-page="${page}"]`);
+                if (navItem) {
+                    navItem.classList.add('active');
+                }
+                
+                // Aggiorna titolo
+                aggiornaTitolo(page);
+                
+                // Logica specifica per pagina
+                if (page === 'dashboard') {
+                    aggiornaDashboard();
+                } else if (page === 'transaction') {
+                    // Focus sull'importo quando si apre la pagina transazioni
+                    setTimeout(() => {
+                        const importoField = document.getElementById('importo');
+                        if (importoField) importoField.focus();
+                    }, 100);
+                }
+            }
+        }
+
+        function aggiornaTitolo(page) {
+            const titleEl = document.getElementById('pageTitle');
+            const titles = {
+                dashboard: '📊 Dashboard',
+                transaction: '💰 Transazioni',
+                reports: '📈 Report',
+                settings: '⚙️ Impostazioni'
+            };
+            
+            if (titleEl && titles[page]) {
+                titleEl.textContent = titles[page];
+            }
+        }
+
+        function inizializzaFormTransazioni() {
             // Imposta data corrente
             document.getElementById('data').valueAsDate = new Date();
+
+            // Spesa preselezionata
+            aggiornaVisibilitaCampi();
+            aggiornaStileBottoni();
 
             // Gestione tipo transazione
             const tipoBtns = document.querySelectorAll('.tipo-btn');
@@ -324,103 +874,392 @@
                     this.classList.add('active');
                     document.getElementById('tipo').value = this.dataset.tipo;
                     aggiornaVisibilitaCampi();
+                    aggiornaStileBottoni();
                 });
             });
 
             // Gestione categoria/sottocategoria
-            document.getElementById('categoria').addEventListener('change', aggiornasottocategorie);
+            document.getElementById('categoria').addEventListener('change', aggiornaSottocategorie);
 
             // Gestione form submit
             document.getElementById('transactionForm').addEventListener('submit', gestisciSubmit);
 
-            // Nascondi conto destinazione inizialmente
-            aggiornaVisibilitaCampi();
+            // Inizializza sistema tag
+            inizializzaTags();
+
+            // Inizializza autocomplete descrizione
+            inizializzaAutocomplete();
         }
 
         function caricaDatiSpreadsheet() {
-            // Mostra indicatore di caricamento
-            mostraMessaggio('loading', 'Caricamento dati...');
+            aggiornaStatoConnessione('loading', 'Caricamento dati...');
             
-            // Usa GET invece di POST per il caricamento iniziale
-            fetch(GOOGLE_APPS_SCRIPT_URL + '?action=getInitialData', {
-                method: 'GET',
-                mode: 'cors'
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    datiSpreadsheet = data.data;
-                    popolaSelectConti();
-                    popolaSelectCategorie();
-                    nascondiMessaggio();
-                } else {
-                    throw new Error(data.error || 'Errore nel caricamento dati');
-                }
-            })
-            .catch(error => {
-                console.error('Errore:', error);
-                mostraMessaggio('error', 'Errore nel caricamento dati. Uso dati di esempio.');
-                // Fallback ai dati di esempio
-                setTimeout(() => {
-                    usaDatiEsempio();
-                    nascondiMessaggio();
-                }, 2000);
+            fetch(GOOGLE_APPS_SCRIPT_URL + '?action=getInitialData')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        datiSpreadsheet = data.data;
+                        popolaSelectConti();
+                        popolaSelectCategorie();
+                        aggiornaStatoConnessione('success', 'Connesso al Google Sheet');
+                        
+                        // Aggiorna dashboard se siamo sulla pagina dashboard
+                        if (currentPage === 'dashboard') {
+                            aggiornaDashboard();
+                        }
+                    } else {
+                        throw new Error(data.message || 'Errore nel caricamento dati dal Google Sheet');
+                    }
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    aggiornaStatoConnessione('error', 'Errore di connessione');
+                    mostraMessaggio('error', 'Impossibile collegarsi al Google Sheet: ' + error.message);
+                });
+        }
+
+        function aggiornaDashboard() {
+            aggiornaSaldiConti();
+            aggiornaGraficoSpese();
+            aggiornaTransazioniRecenti();
+        }
+
+        function aggiornaSaldiConti() {
+            const totalBalanceEl = document.getElementById('totalBalance');
+            const accountsListEl = document.getElementById('accountsList');
+            
+            if (!totalBalanceEl || !accountsListEl) return;
+            
+            if (datiSpreadsheet.conti && datiSpreadsheet.conti.length > 0) {
+                let totalBalance = 0;
+                let accountsHTML = '';
+                
+                datiSpreadsheet.conti.forEach(conto => {
+                    const saldo = parseFloat(conto.saldo) || 0;
+                    totalBalance += saldo;
+                    
+                    const balanceClass = saldo >= 0 ? 'positive' : 'negative';
+                    accountsHTML += `
+                        <div class="account-item">
+                            <div class="account-name">${conto.nome}</div>
+                            <div class="account-balance ${balanceClass}">€ ${saldo.toFixed(2)}</div>
+                        </div>
+                    `;
+                });
+                
+                totalBalanceEl.textContent = `€ ${totalBalance.toFixed(2)}`;
+                accountsListEl.innerHTML = accountsHTML;
+            } else {
+                totalBalanceEl.textContent = '€ 0,00';
+                accountsListEl.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">Nessun conto trovato</div>';
+            }
+        }
+
+        function aggiornaGraficoSpese() {
+            const chartEl = document.getElementById('expensesChart');
+            if (!chartEl) return;
+            
+            // Simulazione di un grafico semplice con CSS
+            const expenseData = [120, 85, 230, 180, 95, 150, 200];
+            const maxValue = Math.max(...expenseData);
+            
+            let chartHTML = '<div style="display: flex; align-items: end; height: 150px; gap: 8px; padding: 10px;">';
+            
+            expenseData.forEach((value, index) => {
+                const height = (value / maxValue) * 120;
+                const color = index === expenseData.length - 1 ? '#ef4444' : '#e5e5e5';
+                chartHTML += `
+                    <div style="
+                        flex: 1;
+                        height: ${height}px;
+                        background: ${color};
+                        border-radius: 4px 4px 0 0;
+                        position: relative;
+                        transition: all 0.3s ease;
+                    " title="€ ${value}">
+                        <div style="
+                            position: absolute;
+                            top: -20px;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            font-size: 10px;
+                            color: #666;
+                        ">€${value}</div>
+                    </div>
+                `;
             });
+            
+            chartHTML += '</div>';
+            chartHTML += '<div style="display: flex; justify-content: space-between; padding: 0 10px; font-size: 10px; color: #666;">';
+            chartHTML += '<span>7gg fa</span><span>Oggi</span>';
+            chartHTML += '</div>';
+            
+            chartEl.innerHTML = chartHTML;
+        }
+
+        function aggiornaTransazioniRecenti() {
+            const recentTransactionsEl = document.getElementById('recentTransactions');
+            if (!recentTransactionsEl) return;
+            
+            // Simulazione di transazioni recenti
+            const recentTransactions = [
+                { description: 'Supermercato', category: 'Alimentari', amount: -45.60, type: 'expense' },
+                { description: 'Stipendio', category: 'Lavoro', amount: 2500.00, type: 'income' },
+                { description: 'Benzina', category: 'Trasporti', amount: -58.30, type: 'expense' },
+                { description: 'Caffè', category: 'Alimentari', amount: -3.50, type: 'expense' },
+                { description: 'Freelance', category: 'Lavoro', amount: 450.00, type: 'income' }
+            ];
+            
+            let transactionsHTML = '';
+            
+            recentTransactions.forEach(transaction => {
+                const amountClass = transaction.type === 'expense' ? 'expense' : 'income';
+                const amountText = transaction.amount > 0 ? `+€ ${transaction.amount.toFixed(2)}` : `€ ${transaction.amount.toFixed(2)}`;
+                
+                transactionsHTML += `
+                    <div class="transaction-item">
+                        <div class="transaction-left">
+                            <div class="transaction-description">${transaction.description}</div>
+                            <div class="transaction-category">${transaction.category}</div>
+                        </div>
+                        <div class="transaction-amount ${amountClass}">${amountText}</div>
+                    </div>
+                `;
+            });
+            
+            recentTransactionsEl.innerHTML = transactionsHTML;
+        }
+
+        function aggiornaStatoConnessione(stato, testo) {
+            const statusEl = document.getElementById('connectionStatus');
+            if (!statusEl) return;
+            
+            const dot = statusEl.querySelector('.status-dot');
+            if (dot) {
+                dot.className = `status-dot ${stato}`;
+            }
+            statusEl.innerHTML = `<span class="status-dot ${stato}"></span>${testo}`;
         }
 
         function popolaSelectConti() {
             const selectConto = document.getElementById('conto');
             const selectContoDestinazione = document.getElementById('contoDestinazione');
             
-            // Pulisci le opzioni esistenti (tranne la prima)
-            selectConto.innerHTML = '<option value="">Seleziona conto...</option>';
-            selectContoDestinazione.innerHTML = '<option value="">Seleziona conto destinazione...</option>';
+            if (!selectConto) return;
             
-            datiSpreadsheet.conti.forEach(conto => {
-                const option1 = new Option(`${conto.nome} (€${conto.saldo || 0})`, conto.nome);
-                const option2 = new Option(`${conto.nome} (€${conto.saldo || 0})`, conto.nome);
-                selectConto.add(option1);
-                selectContoDestinazione.add(option2);
-            });
+            selectConto.innerHTML = '<option value="">Seleziona conto...</option>';
+            if (selectContoDestinazione) {
+                selectContoDestinazione.innerHTML = '<option value="">Seleziona destinazione...</option>';
+            }
+            
+            if (datiSpreadsheet.conti && datiSpreadsheet.conti.length > 0) {
+                datiSpreadsheet.conti.forEach(conto => {
+                    const saldoText = conto.saldo !== undefined ? ` (€${Number(conto.saldo).toFixed(2)})` : '';
+                    const option1 = new Option(`${conto.nome}${saldoText}`, conto.nome);
+                    selectConto.add(option1);
+                    
+                    if (selectContoDestinazione) {
+                        const option2 = new Option(`${conto.nome}${saldoText}`, conto.nome);
+                        selectContoDestinazione.add(option2);
+                    }
+                });
+            } else {
+                selectConto.innerHTML = '<option value="">❌ Nessun conto trovato</option>';
+                if (selectContoDestinazione) {
+                    selectContoDestinazione.innerHTML = '<option value="">❌ Nessun conto trovato</option>';
+                }
+            }
         }
 
         function popolaSelectCategorie() {
-            const categorie = [...new Set(datiSpreadsheet.categorie.map(c => c.categoria))];
             const selectCategoria = document.getElementById('categoria');
+            if (!selectCategoria) return;
             
-            // Pulisci le opzioni esistenti (tranne la prima)
+            const categorie = [...new Set(datiSpreadsheet.categorie.map(c => c.categoria))];
+            
             selectCategoria.innerHTML = '<option value="">Seleziona categoria...</option>';
             
-            categorie.forEach(categoria => {
-                const option = new Option(categoria, categoria);
-                selectCategoria.add(option);
+            if (categorie.length > 0) {
+                categorie.forEach(categoria => {
+                    const option = new Option(categoria, categoria);
+                    selectCategoria.add(option);
+                });
+            } else {
+                selectCategoria.innerHTML = '<option value="">❌ Nessuna categoria trovata</option>';
+            }
+        }
+
+        function aggiornaStileBottoni() {
+            const tipo = document.getElementById('tipo').value;
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (!submitBtn) return;
+            
+            // Rimuovi tutte le classi di tipo
+            submitBtn.classList.remove('spesa', 'entrata', 'trasferimento');
+            
+            // Aggiungi la classe corrente
+            submitBtn.classList.add(tipo);
+        }
+
+        function inizializzaTags() {
+            const tagsInput = document.getElementById('tagsInput');
+            
+            if (!tagsInput) {
+                return;
+            }
+            
+            tagsInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const value = this.value.trim();
+                    if (value && !tags.includes(value)) {
+                        aggiungiTag(value);
+                        this.value = '';
+                    }
+                }
+            });
+
+            tagsInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && this.value === '' && tags.length > 0) {
+                    rimuoviTag(tags[tags.length - 1]);
+                }
             });
         }
 
-        function usaDatiEsempio() {
-            // Dati di fallback in caso di errore di connessione
-            datiSpreadsheet = {
-                conti: [
-                    { nome: "Conto Corrente Principale", saldo: 1500 },
-                    { nome: "Conto Risparmio", saldo: 5000 },
-                    { nome: "Carta Prepagata", saldo: 200 },
-                    { nome: "Portafoglio", saldo: 50 }
-                ],
-                categorie: [
-                    { categoria: "Alimentari", tipo: "Spesa", sottocategoria: "Supermercato", classe: "Necessario" },
-                    { categoria: "Alimentari", tipo: "Spesa", sottocategoria: "Ristorante", classe: "Discrezionale" },
-                    { categoria: "Trasporti", tipo: "Spesa", sottocategoria: "Benzina", classe: "Necessario" },
-                    { categoria: "Stipendio", tipo: "Entrata", sottocategoria: "Lavoro Principale", classe: "Fisso" },
-                    { categoria: "Casa", tipo: "Spesa", sottocategoria: "Affitto", classe: "Necessario" }
-                ]
-            };
-            popolaSelectConti();
-            popolaSelectCategorie();
+        function aggiungiTag(testo) {
+            tags.push(testo);
+            aggiornaTagsDisplay();
+            aggiornaTagsInput();
+        }
+
+        function rimuoviTag(testo) {
+            tags = tags.filter(tag => tag !== testo);
+            aggiornaTagsDisplay();
+            aggiornaTagsInput();
+        }
+
+        // Funzione globale per rimuovere tag (chiamata dall'HTML)
+        function rimuoviTagGlobale(testo) {
+            rimuoviTag(testo);
+        }
+
+        function aggiornaTagsDisplay() {
+            const tagsDisplay = document.getElementById('tagsDisplay');
+            const tagsInput = document.getElementById('tagsInput');
+            
+            if (!tagsDisplay || !tagsInput) return;
+            
+            // Rimuovi tutti i tag esistenti
+            const existingTags = tagsDisplay.querySelectorAll('.tag');
+            existingTags.forEach(tag => tag.remove());
+            
+            // Aggiungi i tag attuali
+            tags.forEach(tagText => {
+                const tagEl = document.createElement('span');
+                tagEl.className = 'tag';
+                tagEl.innerHTML = `${tagText}<span class="tag-remove" onclick="rimuoviTagGlobale('${tagText}')">×</span>`;
+                tagsDisplay.insertBefore(tagEl, tagsInput);
+            });
+        }
+
+        function aggiornaTagsInput() {
+            const hiddenInput = document.getElementById('etichetta');
+            if (hiddenInput) {
+                hiddenInput.value = tags.join(', ');
+            }
+        }
+
+        function inizializzaAutocomplete() {
+            const descrizioneInput = document.getElementById('descrizione');
+            const suggestionsContainer = document.getElementById('descrizioneSuggestions');
+            
+            if (!descrizioneInput || !suggestionsContainer) {
+                return;
+            }
+            
+            let selectedIndex = -1;
+
+            descrizioneInput.addEventListener('input', function() {
+                const value = this.value;
+                
+                if (value.length >= 3) {
+                    const filteredSuggestions = suggerimentiDescrizione.filter(suggestion =>
+                        suggestion.toLowerCase().includes(value.toLowerCase())
+                    );
+                    
+                    mostraSuggerimenti(filteredSuggestions);
+                } else {
+                    nascondSuggerimenti();
+                }
+                
+                selectedIndex = -1;
+            });
+
+            descrizioneInput.addEventListener('keydown', function(e) {
+                const suggestions = suggestionsContainer.querySelectorAll('.autocomplete-suggestion');
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selectedIndex = Math.min(selectedIndex + 1, suggestions.length - 1);
+                    aggiornaSelezioneSuggestion(suggestions);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectedIndex = Math.max(selectedIndex - 1, -1);
+                    aggiornaSelezioneSuggestion(suggestions);
+                } else if (e.key === 'Enter' && selectedIndex >= 0) {
+                    e.preventDefault();
+                    selezionaSuggestion(suggestions[selectedIndex].textContent);
+                } else if (e.key === 'Escape') {
+                    nascondSuggerimenti();
+                }
+            });
+
+            function mostraSuggerimenti(suggestions) {
+                suggestionsContainer.innerHTML = '';
+                
+                if (suggestions.length > 0) {
+                    suggestions.forEach(suggestion => {
+                        const div = document.createElement('div');
+                        div.className = 'autocomplete-suggestion';
+                        div.textContent = suggestion;
+                        div.addEventListener('click', () => selezionaSuggestion(suggestion));
+                        suggestionsContainer.appendChild(div);
+                    });
+                    
+                    suggestionsContainer.style.display = 'block';
+                } else {
+                    nascondSuggerimenti();
+                }
+            }
+
+            function nascondSuggerimenti() {
+                suggestionsContainer.style.display = 'none';
+                selectedIndex = -1;
+            }
+
+            function aggiornaSelezioneSuggestion(suggestions) {
+                suggestions.forEach((suggestion, index) => {
+                    suggestion.classList.toggle('selected', index === selectedIndex);
+                });
+            }
+
+            function selezionaSuggestion(value) {
+                descrizioneInput.value = value;
+                nascondSuggerimenti();
+            }
+
+            // Nasconde suggerimenti quando si clicca fuori
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.autocomplete-container')) {
+                    nascondSuggerimenti();
+                }
+            });
         }
 
         function aggiornaVisibilitaCampi() {
@@ -429,31 +1268,45 @@
             const contoDestinazione = document.getElementById('contoDestinazione');
 
             if (tipo === 'trasferimento') {
-                contoDestinazioneGroup.classList.remove('hidden');
-                contoDestinazione.required = true;
+                if (contoDestinazioneGroup) {
+                    contoDestinazioneGroup.classList.remove('hidden');
+                }
+                if (contoDestinazione) {
+                    contoDestinazione.required = true;
+                }
             } else {
-                contoDestinazioneGroup.classList.add('hidden');
-                contoDestinazione.required = false;
-                contoDestinazione.value = '';
+                if (contoDestinazioneGroup) {
+                    contoDestinazioneGroup.classList.add('hidden');
+                }
+                if (contoDestinazione) {
+                    contoDestinazione.required = false;
+                    contoDestinazione.value = '';
+                }
             }
         }
 
-        function aggiornasottocategorie() {
+        function aggiornaSottocategorie() {
             const categoriaSelezionata = document.getElementById('categoria').value;
             const selectSottocategoria = document.getElementById('sottocategoria');
             
-            // Pulisci sottocategorie
+            if (!selectSottocategoria) return;
+            
             selectSottocategoria.innerHTML = '<option value="">Seleziona sottocategoria...</option>';
 
-            if (categoriaSelezionata) {
+            if (categoriaSelezionata && datiSpreadsheet.categorie) {
                 const sottocategorie = datiSpreadsheet.categorie
                     .filter(c => c.categoria === categoriaSelezionata)
-                    .map(c => c.sottocategoria);
+                    .map(c => c.sottocategoria)
+                    .filter(s => s);
 
-                sottocategorie.forEach(sottocategoria => {
-                    const option = new Option(sottocategoria, sottocategoria);
-                    selectSottocategoria.add(option);
-                });
+                if (sottocategorie.length > 0) {
+                    sottocategorie.forEach(sottocategoria => {
+                        const option = new Option(sottocategoria, sottocategoria);
+                        selectSottocategoria.add(option);
+                    });
+                } else {
+                    selectSottocategoria.innerHTML = '<option value="">❌ Nessuna sottocategoria trovata</option>';
+                }
             }
         }
 
@@ -466,14 +1319,9 @@
             try {
                 const transazioni = creaTransazioni(dati);
                 registraTransazioni(transazioni);
-                mostraMessaggio('success');
-                e.target.reset();
-                document.querySelectorAll('.tipo-btn').forEach(btn => btn.classList.remove('active'));
-                document.getElementById('data').valueAsDate = new Date();
-                aggiornaVisibilitaCampi();
             } catch (error) {
                 console.error('Errore:', error);
-                mostraMessaggio('error');
+                mostraMessaggio('error', 'Errore nella creazione della transazione: ' + error.message);
             }
         }
 
@@ -481,11 +1329,15 @@
             const transazioni = [];
             const importoBase = parseFloat(dati.importo);
             
+            if (isNaN(importoBase) || importoBase <= 0) {
+                throw new Error('Importo non valido');
+            }
+            
             const transazioneBase = {
                 Data: dati.data,
                 Categoria: dati.categoria,
-                Descrizione: dati.descrizione,
-                Etichetta: dati.etichetta
+                Descrizione: dati.descrizione || '',
+                Etichetta: dati.etichetta || ''
             };
 
             if (dati.tipo === 'spesa') {
@@ -505,7 +1357,10 @@
                     ...transazioneBase
                 });
             } else if (dati.tipo === 'trasferimento') {
-                // Transazione di uscita
+                if (!dati.contoDestinazione || dati.conto === dati.contoDestinazione) {
+                    throw new Error('Seleziona un conto di destinazione diverso da quello di partenza');
+                }
+                
                 transazioni.push({
                     Tipo: 'Trasferimento',
                     Conto: dati.conto,
@@ -514,7 +1369,6 @@
                     ...transazioneBase
                 });
                 
-                // Transazione di entrata
                 transazioni.push({
                     Tipo: 'Trasferimento',
                     Conto: dati.contoDestinazione,
@@ -528,76 +1382,95 @@
         }
 
         function registraTransazioni(transazioni) {
-            // Mostra indicatore di caricamento
+            const submitBtn = document.getElementById('submitBtn');
+            const submitText = document.getElementById('submitText');
+            const submitSpinner = document.getElementById('submitSpinner');
+            
+            if (!submitBtn || !submitText || !submitSpinner) return;
+            
+            // Disabilita il pulsante e mostra loading
+            submitBtn.disabled = true;
+            submitText.style.display = 'none';
+            submitSpinner.style.display = 'inline-block';
+            
             mostraMessaggio('loading', 'Registrazione in corso...');
             
-            const payload = {
-                action: 'addTransaction',
-                transactions: transazioni
-            };
+            const formData = new URLSearchParams();
+            formData.append('action', 'addTransaction');
+            formData.append('transactions', JSON.stringify(transazioni));
             
             fetch(GOOGLE_APPS_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-                redirect: 'follow'
+                body: formData
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     mostraMessaggio('success', data.message || 'Transazione registrata con successo!');
-                    // Ricarica i dati per aggiornare i saldi
-                    setTimeout(() => caricaDatiSpreadsheet(), 1000);
+                    
+                    // Reset del form
+                    document.getElementById('transactionForm').reset();
+                    document.getElementById('tipo').value = 'spesa';
+                    document.querySelectorAll('.tipo-btn').forEach(btn => btn.classList.remove('active'));
+                    const spesaBtn = document.querySelector('.tipo-btn.spesa');
+                    if (spesaBtn) spesaBtn.classList.add('active');
+                    document.getElementById('data').valueAsDate = new Date();
+                    
+                    // Reset tags
+                    tags = [];
+                    aggiornaTagsDisplay();
+                    aggiornaTagsInput();
+                    
+                    aggiornaVisibilitaCampi();
+                    aggiornaStileBottoni();
+                    
+                    // Focus sull'importo per la prossima transazione
+                    setTimeout(() => {
+                        const importoField = document.getElementById('importo');
+                        if (importoField) importoField.focus();
+                    }, 100);
+                    
+                    // Ricarica i dati per aggiornare i saldi e dashboard
+                    setTimeout(() => {
+                        caricaDatiSpreadsheet();
+                    }, 1000);
                 } else {
-                    throw new Error(data.error || 'Errore sconosciuto');
+                    throw new Error(data.message || 'Errore sconosciuto');
                 }
             })
             .catch(error => {
                 console.error('Errore nella registrazione:', error);
                 mostraMessaggio('error', 'Errore nella registrazione: ' + error.message);
-                // Mostra anche i dati in console per debug
-                console.log('Dati che stavano per essere inviati:', transazioni);
+            })
+            .finally(() => {
+                // Riabilita il pulsante
+                submitBtn.disabled = false;
+                submitText.style.display = 'inline';
+                submitSpinner.style.display = 'none';
             });
         }
 
-        function mostraMessaggio(tipo, messaggio = '') {
-            const successMsg = document.getElementById('successMessage');
-            const errorMsg = document.getElementById('errorMessage');
+        function mostraMessaggio(tipo, testo) {
+            const messageEl = document.getElementById('message');
+            if (!messageEl) return;
             
-            // Nascondi tutti i messaggi
-            successMsg.style.display = 'none';
-            errorMsg.style.display = 'none';
+            messageEl.className = `message ${tipo}`;
+            messageEl.textContent = testo;
+            messageEl.style.display = 'block';
             
             if (tipo === 'success') {
-                successMsg.textContent = messaggio || 'Transazione registrata con successo!';
-                successMsg.style.display = 'block';
-                setTimeout(() => successMsg.style.display = 'none', 5000);
-            } else if (tipo === 'error') {
-                errorMsg.textContent = messaggio || 'Errore durante la registrazione della transazione.';
-                errorMsg.style.display = 'block';
-                setTimeout(() => errorMsg.style.display = 'none', 8000);
+                setTimeout(() => {
+                    messageEl.style.display = 'none';
+                }, 3000);
             } else if (tipo === 'loading') {
-                successMsg.textContent = messaggio || 'Caricamento...';
-                successMsg.style.background = '#2196F3';
-                successMsg.style.display = 'block';
+                // I messaggi di loading rimangono fino alla fine dell'operazione
+            } else {
+                // Errori rimangono visibili più a lungo
+                setTimeout(() => {
+                    messageEl.style.display = 'none';
+                }, 8000);
             }
         }
-
-        function nascondiMessaggio() {
-            document.getElementById('successMessage').style.display = 'none';
-            document.getElementById('errorMessage').style.display = 'none';
-        }
-
-        // Rimuovi le funzioni non più necessarie
-        // appendRowToSheet e getSheetData sono ora gestite da Google Apps Script
     </script>
 </body>
 </html>
