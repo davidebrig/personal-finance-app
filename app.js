@@ -26,6 +26,21 @@ document.addEventListener('DOMContentLoaded', function() {
     loadSpreadsheetData();
 });
 
+// Funzione per gestire i parametri URL
+function handleURLParameters() {
+    // Ottieni i parametri dall'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const page = urlParams.get('page');
+    
+    // Se c'è un parametro 'page', vai a quella pagina
+    if (page) {
+        // Aspetta che l'app sia inizializzata
+        setTimeout(() => {
+            changePage(page);
+        }, 100);
+    }
+}
+
 function initializeApp() {
     initializeNavigation();
     initializeTransactionForm();
@@ -33,6 +48,7 @@ function initializeApp() {
     initializeAmountInput();
     initializeStickySubmit();
     updateLastConnectionTime();
+    handleURLParameters();
     
     DEBUG.log('App completa inizializzata con successo');
 }
@@ -607,6 +623,9 @@ function displayMonthlyStats(stats) {
     if (savingRateEl) {
         const currentSavingRate = calculateSavingRate(stats.monthlyIncome || 0, stats.monthlyExpenses || 0);
         savingRateEl.textContent = `${currentSavingRate.toFixed(1)}%`;
+        
+        // Aggiorna l'indicatore
+        updateSavingRateIndicator(currentSavingRate);
     }
     
     // Mostra percentuali di cambiamento
@@ -676,6 +695,40 @@ function getChangeClass(percentage) {
     if (percentage > 0) return 'positive';
     if (percentage < 0) return 'negative';
     return 'neutral';
+}
+
+function updateSavingRateIndicator(savingRate) {
+    const indicatorEl = document.getElementById('savingRateIndicator');
+    if (!indicatorEl) return;
+    
+    const indicatorText = indicatorEl.querySelector('.indicator-text');
+    if (!indicatorText) return;
+    
+    // Rimuovi classi precedenti
+    indicatorText.classList.remove('excellent', 'good', 'low');
+    
+    // Logica per determinare lo stato
+    if (savingRate >= 30) {
+        // 30% o più: Eccellente
+        indicatorText.textContent = 'Eccellente';
+        indicatorText.classList.add('excellent');
+    } else if (savingRate >= 20) {
+        // 20-29%: Buono
+        indicatorText.textContent = 'Buono';
+        indicatorText.classList.add('good');
+    } else if (savingRate >= 10) {
+        // 10-19%: Neutro
+        indicatorText.textContent = 'Neutro';
+        // Nessuna classe aggiuntiva, usa lo stile default
+    } else if (savingRate >= 0) {
+        // 0-9%: Basso
+        indicatorText.textContent = 'Basso';
+        indicatorText.classList.add('low');
+    } else {
+        // Negativo: Deficit
+        indicatorText.textContent = 'Deficit';
+        indicatorText.classList.add('low');
+    }
 }
 
 function updateAccountBalances() {
@@ -865,16 +918,34 @@ function populateAccountSelects() {
     }
     
     if (AppState.datiSpreadsheet.conti && AppState.datiSpreadsheet.conti.length > 0) {
-        AppState.datiSpreadsheet.conti.forEach(conto => {
+        let defaultAccountFound = false;
+        
+        AppState.datiSpreadsheet.conti.forEach((conto, index) => {
             const saldoText = conto.saldo !== undefined ? ` (${NumberUtils.formatCurrency(conto.saldo)})` : '';
             const option1 = new Option(`${conto.nome}${saldoText}`, conto.nome);
             selectConto.add(option1);
+            
+            // OPZIONE 1: Seleziona il conto predefinito se configurato
+            if (CONFIG.FORM.DEFAULT_ACCOUNT && conto.nome === CONFIG.FORM.DEFAULT_ACCOUNT) {
+                selectConto.value = conto.nome;
+                defaultAccountFound = true;
+            }
+            
+            // OPZIONE 2: Seleziona il primo conto se non c'è un predefinito
+            // if (index === 0) {
+            //     selectConto.value = conto.nome;
+            // }
             
             if (selectContoDestinazione) {
                 const option2 = new Option(`${conto.nome}${saldoText}`, conto.nome);
                 selectContoDestinazione.add(option2);
             }
         });
+        
+        // Se il conto predefinito non è stato trovato, seleziona il primo
+        if (!defaultAccountFound && AppState.datiSpreadsheet.conti.length > 0) {
+            selectConto.value = AppState.datiSpreadsheet.conti[0].nome;
+        }
     } else {
         selectConto.innerHTML = '<option value="">❌ Nessun conto trovato</option>';
         if (selectContoDestinazione) {
