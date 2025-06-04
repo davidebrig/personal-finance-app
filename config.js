@@ -81,6 +81,11 @@ const PAGES = {
         icon: '➕',
         label: 'Aggiungi'
     },
+    shared: {
+        title: '👥 Transazioni Condivise',
+        icon: '👥',
+        label: 'Condivise'
+    },
     settings: {
         title: '⚙️ Impostazioni', 
         icon: '⚙️',
