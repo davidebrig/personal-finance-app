@@ -217,9 +217,15 @@ const NumberUtils = {
     // Formatta percentuale con segno
     formatPercentageChange: function(percentage) {
         if (percentage === 0) return '0%';
+
+        // Arrotonda a una cifra decimale
+        const rounded = Math.round(percentage * 10) / 10;
         
-        const sign = percentage > 0 ? '+' : '';
-        return `${sign}${percentage}%`;
+        // Assicurati che ci sia sempre una cifra decimale
+        const formatted = rounded.toFixed(1);
+
+        const sign = rounded > 0 ? '+' : '';
+        return `${sign}${formatted}%`;
     }
 };
 
