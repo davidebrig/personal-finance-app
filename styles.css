@@ -84,16 +84,17 @@
   --bottom-nav-height: 60px;
   --sticky-submit-height: 70px;
 
-  /* Safe Areas per dispositivi moderni */
+  /* Safe Areas */
   --safe-area-inset-top: env(safe-area-inset-top, 0px);
   --safe-area-inset-right: env(safe-area-inset-right, 0px);
   --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
   --safe-area-inset-left: env(safe-area-inset-left, 0px);
   
-  /* Altezze adattive per PWA */
-  --header-height: calc(50px + var(--safe-area-inset-top));
-  --bottom-nav-height: calc(60px + var(--safe-area-inset-bottom));
-  --sticky-submit-height: calc(70px + var(--safe-area-inset-bottom));
+  /* Altezze corrette per PWA */
+  --header-height: 56px;
+  --bottom-nav-height: 65px; /* Altezza fissa della nav */
+  --bottom-nav-total-height: calc(65px + var(--safe-area-inset-bottom)); /* Altezza totale con safe area */
+  --sticky-submit-height: 70px;
 }
 
 /* RESET & BASE STYLES */
@@ -118,19 +119,10 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  min-height: -webkit-fill-available; /* Fix per Safari iOS */
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
-  /* Padding per safe areas */
-  padding-top: var(--safe-area-inset-top);
-  padding-bottom: var(--safe-area-inset-bottom);
-  
-  /* Previeni bounce su iOS */
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
 }
 
 /* LAYOUT CONTAINER */
@@ -138,15 +130,10 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-height: -webkit-fill-available;
   max-width: var(--max-width-mobile);
   margin: 0 auto;
   background-color: var(--color-background);
-  position: relative;
-  
-  /* Altezza piena con safe areas */
-  height: 100vh;
-  height: 100dvh; /* Dynamic viewport height per browser moderni */
-  overflow: hidden;
   position: relative;
 }
 
@@ -157,23 +144,15 @@ body {
   z-index: 50;
   border-bottom: 1px solid var(--color-border);
   padding: var(--space-md) var(--space-lg);
+  padding-top: calc(var(--space-md) + var(--safe-area-inset-top));
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: var(--space-lg);
-  height: var(--header-height);
-  background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 100%);
+  min-height: var(--header-height);
+  background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  
-  /* Padding top con safe area */
-  padding-top: calc(var(--space-md) + var(--safe-area-inset-top));
-  height: var(--header-height);
-
-  /* Estendi il background nella safe area */
-  margin-top: calc(-1 * var(--safe-area-inset-top));
-  padding-left: calc(var(--space-lg) + var(--safe-area-inset-left));
-  padding-right: calc(var(--space-lg) + var(--safe-area-inset-right));
 }
 
 .header-title {
@@ -242,20 +221,17 @@ body {
 /* MAIN CONTENT */
 .app-main {
   flex: 1;
-  padding: var(--space-md) var(--space-lg) calc(var(--bottom-nav-height) + var(--space-lg)) var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  padding-bottom: calc(var(--bottom-nav-total-height) + var(--space-lg));
   width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling iOS */
-  
-  /* Padding laterali con safe areas */
-  padding-left: calc(var(--space-lg) + var(--safe-area-inset-left));
-  padding-right: calc(var(--space-lg) + var(--safe-area-inset-right));
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Add extra padding when sticky submit is visible */
+/* Aggiusta il padding del main quando sticky submit è attivo */
 .app-main.with-sticky-submit {
-  padding-bottom: calc(var(--bottom-nav-height) + var(--sticky-submit-height) + var(--space-lg));
+  padding-bottom: calc(var(--bottom-nav-total-height) + var(--sticky-submit-height) + var(--space-lg));
 }
 
 /* PAGES */
@@ -1091,61 +1067,56 @@ body {
 .bottom-nav {
   position: fixed;
   bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
   width: 100%;
-  max-width: var(--max-width-mobile);
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: var(--space-md) var(--space-lg);
-  z-index: 40;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+  height: var(--bottom-nav-total-height);
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-top: 1px solid rgba(0, 0, 0, 0.06);
-  height: var(--bottom-nav-height);
-
-  /* Padding bottom con safe area */
-  padding-bottom: calc(var(--space-md) + var(--safe-area-inset-bottom));
-  height: var(--bottom-nav-height);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  z-index: 40;
   
-  /* Estendi il background nella safe area */
-  margin-bottom: calc(-1 * var(--safe-area-inset-bottom));
-  padding-left: calc(var(--space-lg) + var(--safe-area-inset-left));
-  padding-right: calc(var(--space-lg) + var(--safe-area-inset-right));
-  
-  /* Fix per iPhone - background esteso */
-  background: linear-gradient(to bottom, 
-    rgba(255, 255, 255, 0.98) 0%, 
-    rgba(255, 255, 255, 0.98) calc(100% - var(--safe-area-inset-bottom)), 
-    rgba(255, 255, 255, 1) 100%
-  );
+  /* Contenitore flex */
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  padding: var(--space-sm) var(--space-md);
+  padding-bottom: calc(var(--space-sm) + var(--safe-area-inset-bottom));
 }
 
 .nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-decoration: none;
   color: var(--color-text-light);
   transition: var(--transition-normal);
   cursor: pointer;
-  padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-md);
-  min-width: 60px;
   border: none;
   background: none;
   font-family: inherit;
-  min-height: 44px;
   flex: 1;
+  max-width: 80px;
+  min-height: 52px;
+  padding: var(--space-sm) var(--space-xs);
+  border-radius: var(--radius-md);
   position: relative;
-  
-  /* Migliore distribuzione su mobile */
-  flex: 1;
-  max-width: 100px; /* Limita la larghezza massima */
-  padding: var(--space-md) var(--space-sm);
+}
+
+.nav-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 3px;
+  background-color: var(--color-primary);
+  border-radius: 2px;
+  transition: width var(--transition-normal);
 }
 
 .nav-item::before {
@@ -1166,24 +1137,26 @@ body {
 
 .nav-item.active {
   color: var(--color-text);
-  background-color: #f8f9fa;
+}
+
+.nav-item.active::after {
+  width: 24px;
 }
 
 .nav-item:hover {
-  color: var(--color-text);
-  background-color: #f1f3f4;
+  background-color: rgba(0, 0, 0, 0.02);
 }
 
 /* Special styling for add button */
 .nav-item--add {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  background: var(--color-primary);
   color: #ffffff !important;
-  border-radius: var(--radius-lg);
-  margin: 0 var(--space-sm);
-  box-shadow: var(--shadow-md);
-  transform: scale(1.05);
-  font-size: var(--font-size-2xl);
-  margin-bottom: 0;
+  border-radius: var(--radius-full);
+  max-width: 56px;
+  min-height: 56px;
+  margin: 0 var(--space-xs);
+  margin-top: -8px; /* Solleva leggermente il bottone */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .nav-item--add .nav-label {
@@ -1191,9 +1164,9 @@ body {
 }
 
 .nav-item--add:hover {
-  background: linear-gradient(135deg, var(--color-primary-light), #404040);
-  color: #ffffff !important;
-  transform: scale(1.08);
+  background: var(--color-primary-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .nav-item--add.active {
@@ -1201,51 +1174,51 @@ body {
   color: #ffffff !important;
 }
 
+.nav-item--add::after {
+  display: none; /* Niente linea per il bottone add */
+}
+
 .nav-icon {
-  font-size: var(--font-size-lg);
-  margin-bottom: var(--space-xs);
+  font-size: 22px;
+  margin-bottom: 4px;
   line-height: 1;
 }
 
 .nav-icon--add {
-  font-size: var(--font-size-xl);
+  font-size: 24px;
   font-weight: 300;
-  margin-bottom: var(--space-xs);
+  margin-bottom: 0;
 }
 
 .nav-label {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--line-height-tight);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+/* Nasconde la label per il bottone add */
+.nav-item--add .nav-label {
+  display: none;
 }
 
 /* STICKY SUBMIT BUTTON */
+/* Sticky submit con safe area */
 .sticky-submit {
   position: fixed;
-  bottom: var(--bottom-nav-height);
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: var(--bottom-nav-total-height);
+  left: 0;
+  right: 0;
   width: 100%;
-  max-width: var(--max-width-mobile);
   padding: var(--space-lg);
+  padding-bottom: var(--space-lg);
   z-index: 35;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-top: 1px solid rgba(0, 0, 0, 0.06);
-  height: var(--sticky-submit-height);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
   display: none;
-
-  /* Posizionamento con safe area */
-  bottom: var(--bottom-nav-height);
-  padding-bottom: var(--space-lg);
-  height: auto;
-  min-height: var(--sticky-submit-height);
-  
-  /* Padding laterali con safe areas */
-  padding-left: calc(var(--space-lg) + var(--safe-area-inset-left));
-  padding-right: calc(var(--space-lg) + var(--safe-area-inset-right));
 }
 
 .sticky-submit.active {
@@ -1644,11 +1617,15 @@ body {
 
 /* RESPONSIVE DESIGN AGGIORNATO */
 
-/* iPhone SE, iPhone 8 e simili */
+/* Fix per iPhone SE e dispositivi piccoli */
 @media (max-width: 375px) {
   .nav-item {
-    min-width: unset;
-    padding: var(--space-sm) var(--space-xs);
+    max-width: 70px;
+    min-height: 48px;
+  }
+  
+  .nav-icon {
+    font-size: 20px;
   }
   
   .nav-label {
@@ -1656,105 +1633,87 @@ body {
   }
   
   .nav-item--add {
-    max-width: 55px;
-    height: 40px;
+    max-width: 50px;
+    min-height: 50px;
+    margin-top: -6px;
   }
 }
 
-/* Tablets e iPad (PWA) */
-@media (min-width: 768px) and (max-width: 1024px) {
+/* Fix per iPhone Pro Max e dispositivi grandi */
+@media (min-width: 428px) {
+  .bottom-nav {
+    max-width: var(--max-width-mobile);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* Tablet e iPad */
+@media (min-width: 768px) {
   :root {
-    --bottom-nav-height: calc(80px + var(--safe-area-inset-bottom));
+    --bottom-nav-height: 70px;
   }
   
   .bottom-nav {
     justify-content: center;
-    gap: var(--space-2xl);
-    max-width: 600px;
-    left: 50%;
-    transform: translateX(-50%);
+    gap: var(--space-xl);
+    padding: var(--space-md) var(--space-xl);
   }
   
   .nav-item {
-    max-width: 120px;
+    max-width: 90px;
+    min-height: 56px;
   }
   
-  .nav-item--add .nav-label {
-    display: block; /* Mostra label su tablet */
+  .nav-item--add {
+    max-width: 60px;
+    min-height: 60px;
+  }
+  
+  .nav-label {
+    font-size: 12px;
   }
 }
 
 /* Desktop */
-@media (min-width: 1025px) {
+@media (min-width: 1024px) {
   /* Reset safe areas su desktop */
   :root {
-    --safe-area-inset-top: 0px;
-    --safe-area-inset-right: 0px;
     --safe-area-inset-bottom: 0px;
-    --safe-area-inset-left: 0px;
-  }
-  
-  body {
-    position: static;
-    padding: 0;
-  }
-  
-  .app-container {
-    height: auto;
-    min-height: 100vh;
   }
   
   .bottom-nav {
-    /* Stile desktop più elegante */
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     max-width: 600px;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
-  }
-  
-  .nav-item {
-    max-width: 100px;
-  }
-  
-  .nav-item--add {
-    max-width: 80px;
-    height: 50px;
-  }
-  
-  .nav-item--add .nav-label {
-    display: block;
   }
 }
 
-/* PWA Standalone mode adjustments */
-@media (display-mode: standalone) {
-  /* Status bar su iOS */
-  .app-header {
-    background: linear-gradient(to bottom,
-      #000000 0,
-      #000000 var(--safe-area-inset-top),
-      rgba(255, 255, 255, 0.98) var(--safe-area-inset-top),
-      rgba(255, 255, 255, 0.95) 100%
-    );
-  }
-}
-
-/* Landscape mode per PWA */
+/* Landscape mode fix */
 @media (orientation: landscape) and (max-height: 500px) {
   :root {
-    --bottom-nav-height: calc(50px + var(--safe-area-inset-bottom));
-    --header-height: calc(45px + var(--safe-area-inset-top));
+    --bottom-nav-height: 52px;
+  }
+  
+  .bottom-nav {
+    padding: var(--space-xs) var(--space-md);
   }
   
   .nav-item {
-    padding: var(--space-xs);
+    min-height: 44px;
+  }
+  
+  .nav-icon {
+    font-size: 18px;
+    margin-bottom: 2px;
   }
   
   .nav-label {
-    display: none;
+    font-size: 9px;
   }
   
   .nav-item--add {
-    height: 35px;
-    max-width: 50px;
+    max-width: 44px;
+    min-height: 44px;
+    margin-top: -4px;
   }
 }
