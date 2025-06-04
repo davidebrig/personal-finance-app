@@ -83,6 +83,17 @@
   --header-height: 50px;
   --bottom-nav-height: 60px;
   --sticky-submit-height: 70px;
+
+  /* Safe Areas per dispositivi moderni */
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  
+  /* Altezze adattive per PWA */
+  --header-height: calc(50px + var(--safe-area-inset-top));
+  --bottom-nav-height: calc(60px + var(--safe-area-inset-bottom));
+  --sticky-submit-height: calc(70px + var(--safe-area-inset-bottom));
 }
 
 /* RESET & BASE STYLES */
@@ -110,6 +121,16 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  
+  /* Padding per safe areas */
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
+  
+  /* Previeni bounce su iOS */
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 /* LAYOUT CONTAINER */
@@ -120,6 +141,12 @@ body {
   max-width: var(--max-width-mobile);
   margin: 0 auto;
   background-color: var(--color-background);
+  position: relative;
+  
+  /* Altezza piena con safe areas */
+  height: 100vh;
+  height: 100dvh; /* Dynamic viewport height per browser moderni */
+  overflow: hidden;
   position: relative;
 }
 
@@ -138,6 +165,15 @@ body {
   background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 100%);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
+  
+  /* Padding top con safe area */
+  padding-top: calc(var(--space-md) + var(--safe-area-inset-top));
+  height: var(--header-height);
+
+  /* Estendi il background nella safe area */
+  margin-top: calc(-1 * var(--safe-area-inset-top));
+  padding-left: calc(var(--space-lg) + var(--safe-area-inset-left));
+  padding-right: calc(var(--space-lg) + var(--safe-area-inset-right));
 }
 
 .header-title {
@@ -208,7 +244,13 @@ body {
   flex: 1;
   padding: var(--space-md) var(--space-lg) calc(var(--bottom-nav-height) + var(--space-lg)) var(--space-lg);
   width: 100%;
+  overflow-y: auto;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling iOS */
+  
+  /* Padding laterali con safe areas */
+  padding-left: calc(var(--space-lg) + var(--safe-area-inset-left));
+  padding-right: calc(var(--space-lg) + var(--safe-area-inset-right));
 }
 
 /* Add extra padding when sticky submit is visible */
@@ -1064,6 +1106,22 @@ body {
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-top: 1px solid rgba(0, 0, 0, 0.06);
   height: var(--bottom-nav-height);
+
+  /* Padding bottom con safe area */
+  padding-bottom: calc(var(--space-md) + var(--safe-area-inset-bottom));
+  height: var(--bottom-nav-height);
+  
+  /* Estendi il background nella safe area */
+  margin-bottom: calc(-1 * var(--safe-area-inset-bottom));
+  padding-left: calc(var(--space-lg) + var(--safe-area-inset-left));
+  padding-right: calc(var(--space-lg) + var(--safe-area-inset-right));
+  
+  /* Fix per iPhone - background esteso */
+  background: linear-gradient(to bottom, 
+    rgba(255, 255, 255, 0.98) 0%, 
+    rgba(255, 255, 255, 0.98) calc(100% - var(--safe-area-inset-bottom)), 
+    rgba(255, 255, 255, 1) 100%
+  );
 }
 
 .nav-item {
@@ -1083,6 +1141,11 @@ body {
   min-height: 44px;
   flex: 1;
   position: relative;
+  
+  /* Migliore distribuzione su mobile */
+  flex: 1;
+  max-width: 100px; /* Limita la larghezza massima */
+  padding: var(--space-md) var(--space-sm);
 }
 
 .nav-item::before {
@@ -1119,6 +1182,12 @@ body {
   margin: 0 var(--space-sm);
   box-shadow: var(--shadow-md);
   transform: scale(1.05);
+  font-size: var(--font-size-2xl);
+  margin-bottom: 0;
+}
+
+.nav-item--add .nav-label {
+  display: none; /* Nascondi label su mobile per risparmiare spazio */
 }
 
 .nav-item--add:hover {
@@ -1167,6 +1236,16 @@ body {
   border-top: 1px solid rgba(0, 0, 0, 0.06);
   height: var(--sticky-submit-height);
   display: none;
+
+  /* Posizionamento con safe area */
+  bottom: var(--bottom-nav-height);
+  padding-bottom: var(--space-lg);
+  height: auto;
+  min-height: var(--sticky-submit-height);
+  
+  /* Padding laterali con safe areas */
+  padding-left: calc(var(--space-lg) + var(--safe-area-inset-left));
+  padding-right: calc(var(--space-lg) + var(--safe-area-inset-right));
 }
 
 .sticky-submit.active {
@@ -1321,7 +1400,7 @@ body {
   }
 
   .form-container {
-    padding: var(--space-xl);
+    padding: var(--space-md);
   }
 
   .tipo-buttons {
@@ -1560,5 +1639,122 @@ body {
     animation: none;
     border: 2px solid var(--color-border);
     border-top: 2px solid var(--color-primary);
+  }
+}
+
+/* RESPONSIVE DESIGN AGGIORNATO */
+
+/* iPhone SE, iPhone 8 e simili */
+@media (max-width: 375px) {
+  .nav-item {
+    min-width: unset;
+    padding: var(--space-sm) var(--space-xs);
+  }
+  
+  .nav-label {
+    font-size: 10px;
+  }
+  
+  .nav-item--add {
+    max-width: 55px;
+    height: 40px;
+  }
+}
+
+/* Tablets e iPad (PWA) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  :root {
+    --bottom-nav-height: calc(80px + var(--safe-area-inset-bottom));
+  }
+  
+  .bottom-nav {
+    justify-content: center;
+    gap: var(--space-2xl);
+    max-width: 600px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .nav-item {
+    max-width: 120px;
+  }
+  
+  .nav-item--add .nav-label {
+    display: block; /* Mostra label su tablet */
+  }
+}
+
+/* Desktop */
+@media (min-width: 1025px) {
+  /* Reset safe areas su desktop */
+  :root {
+    --safe-area-inset-top: 0px;
+    --safe-area-inset-right: 0px;
+    --safe-area-inset-bottom: 0px;
+    --safe-area-inset-left: 0px;
+  }
+  
+  body {
+    position: static;
+    padding: 0;
+  }
+  
+  .app-container {
+    height: auto;
+    min-height: 100vh;
+  }
+  
+  .bottom-nav {
+    /* Stile desktop più elegante */
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    max-width: 600px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+  }
+  
+  .nav-item {
+    max-width: 100px;
+  }
+  
+  .nav-item--add {
+    max-width: 80px;
+    height: 50px;
+  }
+  
+  .nav-item--add .nav-label {
+    display: block;
+  }
+}
+
+/* PWA Standalone mode adjustments */
+@media (display-mode: standalone) {
+  /* Status bar su iOS */
+  .app-header {
+    background: linear-gradient(to bottom,
+      #000000 0,
+      #000000 var(--safe-area-inset-top),
+      rgba(255, 255, 255, 0.98) var(--safe-area-inset-top),
+      rgba(255, 255, 255, 0.95) 100%
+    );
+  }
+}
+
+/* Landscape mode per PWA */
+@media (orientation: landscape) and (max-height: 500px) {
+  :root {
+    --bottom-nav-height: calc(50px + var(--safe-area-inset-bottom));
+    --header-height: calc(45px + var(--safe-area-inset-top));
+  }
+  
+  .nav-item {
+    padding: var(--space-xs);
+  }
+  
+  .nav-label {
+    display: none;
+  }
+  
+  .nav-item--add {
+    height: 35px;
+    max-width: 50px;
   }
 }
