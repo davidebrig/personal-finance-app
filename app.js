@@ -190,13 +190,16 @@ function handlePageChange(page) {
             break;
         case 'addTransaction':
             showStickySubmit();
-            // Focus sull'importo quando si apre la pagina transazioni
             if (CONFIG.FORM.AUTO_FOCUS_AMOUNT) {
                 setTimeout(() => {
                     const importoField = document.getElementById('importo');
                     if (importoField) importoField.focus();
                 }, 100);
             }
+            break;
+        case 'shared':
+            // Per ora non fa nulla, pagina placeholder
+            hideStickySubmit();
             break;
         case 'settings':
             updateLastConnectionTime();
