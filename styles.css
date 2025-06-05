@@ -145,6 +145,7 @@ body {
   padding-top: calc(var(--space-md) + var(--safe-area-inset-top));
   display: flex;
   justify-content: space-between;
+  /* Modificato per accomodare il toggle button a sinistra */
   align-items: center;
   gap: var(--space-lg);
   min-height: var(--header-height);
@@ -153,14 +154,50 @@ body {
   -webkit-backdrop-filter: blur(20px) saturate(180%);
 }
 
+.balance-toggle-btn {
+    background: none;
+    border: none;
+    /* font-size: 1.8rem; */ /* Rimosso, usiamo SVG */
+    color: var(--color-text);
+    cursor: pointer;
+    padding: 0; /* Padding interno gestito da dimensioni e flex */
+    margin-right: var(--space-sm); /* Spazio tra bottone e titolo */
+    line-height: 1;
+    flex-shrink: 0; /* Non far restringere il bottone */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px; /* Area cliccabile leggermente più grande */
+    height: 36px; /* Area cliccabile leggermente più grande */
+    border-radius: var(--radius-md); /* Coerenza con altri elementi */
+    transition: background-color var(--transition-fast);
+}
+
+.balance-toggle-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05); /* Feedback al passaggio del mouse */
+}
+
+.balance-toggle-btn:active {
+    background-color: rgba(255, 255, 255, 0.1); /* Feedback al click */
+}
+
 .header-title {
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-semibold);
   margin: 0;
   flex-shrink: 0;
+  flex-grow: 1; /* Permette al titolo di occupare lo spazio rimanente */
+  text-align: center; /* Centra il titolo */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-left: auto; /* Aiuta a centrare se il connection-status è presente */
+  margin-right: auto; /* Aiuta a centrare se il connection-status è presente */
+}
+.balance-toggle-btn svg {
+    width: 20px; /* Dimensione effettiva dell'icona */
+    height: 20px; /* Dimensione effettiva dell'icona */
+    stroke: currentColor; /* Eredita il colore dal bottone */
 }
 
 .connection-status {
@@ -987,6 +1024,18 @@ body {
 .transaction-account {
   font-size: var(--font-size-xs);
   color: var(--color-text-light);
+}
+
+/* Classe per nascondere i saldi con effetto blur migliorato */
+.balance-value.blurred-balance {
+    filter: blur(8px);  /* Aumentata l'intensità del blur, puoi provare anche 10px o 12px se necessario */
+    opacity: 0.6;       /* Ridotta l'opacità per rendere il testo meno definito e contrastato */
+    user-select: none; /* Impedisce la selezione del testo nascosto */
+    transition: filter 0.3s ease-in-out, opacity 0.3s ease-in-out; /* Transizione per le nuove proprietà */
+}
+
+.balance-value {
+    transition: filter 0.3s ease-in-out, opacity 0.3s ease-in-out; /* Transizione per filter e opacity anche quando si rivela */
 }
 
 /* ACCOUNTS LIST */
