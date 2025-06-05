@@ -2,9 +2,9 @@
 // FINANCE APP - COMPLETE JAVASCRIPT
 // ===============================================
 
-// Global State Management
+// Global State Management & Balance Visibility
 const AppState = {
-    currentPage: 'dashboard',
+    currentPage: 'addTransaction', // Imposta 'addTransaction' come pagina di default
     isLoading: false,
     datiSpreadsheet: {
         conti: [],
@@ -14,6 +14,9 @@ const AppState = {
     tags: [],
     connectionStatus: APP_STATES.LOADING
 };
+
+const BALANCE_VISIBILITY_KEY = 'financeAppBalancesVisible';
+let balancesVisible = localStorage.getItem(BALANCE_VISIBILITY_KEY) === 'true'; // Nascosto di default se non presente o 'false'
 
 // ===============================================
 // APPLICATION INITIALIZATION
@@ -26,29 +29,24 @@ document.addEventListener('DOMContentLoaded', function() {
     loadSpreadsheetData();
 });
 
-// Funzione per gestire i parametri URL
-function handleURLParameters() {
-    // Ottieni i parametri dall'URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const page = urlParams.get('page');
-    
-    // Se c'è un parametro 'page', vai a quella pagina
-    if (page) {
-        // Aspetta che l'app sia inizializzata
-        setTimeout(() => {
-            changePage(page);
-        }, 100);
-    }
-}
-
 function initializeApp() {
     initializeNavigation();
     initializeTransactionForm();
     initializeConnectionStatus();
     initializeAmountInput();
     initializeStickySubmit();
-    updateLastConnectionTime();
-    handleURLParameters();
+    initializeBalanceVisibilityToggle(); // Inizializza il toggle per la visibilità dei saldi
+
+    // Gestione pagina iniziale (default o da URL)
+    const urlParams = new URLSearchParams(window.location.search);
+    const pageFromUrl = urlParams.get('page');
+    let initialPage = AppState.currentPage; // Usa il default da AppState
+
+    if (pageFromUrl && document.getElementById(pageFromUrl + 'Page')) {
+        initialPage = pageFromUrl;
+    }
+    changePage(initialPage, true); // true per indicare caricamento iniziale
+    updateLastConnectionTime(); // Chiamato dopo il setup della pagina
     
     DEBUG.log('App completa inizializzata con successo');
 }
@@ -122,6 +120,47 @@ function updateLastConnectionTime() {
 }
 
 // ===============================================
+// BALANCE VISIBILITY MANAGEMENT
+// ===============================================
+
+function initializeBalanceVisibilityToggle() {
+    const toggleButton = document.getElementById('toggleBalanceVisibility');
+    if (toggleButton) {
+        toggleButton.addEventListener('click', toggleBalanceState);
+        // Applica lo stato iniziale subito.
+        // I dati dinamici lo applicheranno quando caricati.
+        applyBalanceVisibility(balancesVisible);
+    }
+    DEBUG.log('Toggle visibilità saldi inizializzato');
+}
+
+function applyBalanceVisibility(visible) {
+    const elementsToToggle = document.querySelectorAll('.balance-value');
+    elementsToToggle.forEach(el => {
+        if (visible) {
+            el.classList.remove('blurred-balance');
+        } else {
+            el.classList.add('blurred-balance');
+        }
+    });
+    const toggleButton = document.getElementById('toggleBalanceVisibility');
+    if (toggleButton) {
+        if (visible) { // Se i saldi sono VISIBILI, l'icona mostra l'azione per NASCONDERE
+            toggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+            toggleButton.setAttribute('aria-label', 'Nascondi saldi');
+        } else { // Se i saldi sono NASCOSTI, l'icona mostra l'azione per MOSTRARE
+            toggleButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+            toggleButton.setAttribute('aria-label', 'Mostra saldi');
+        }
+    }
+}
+
+function toggleBalanceState() {
+    balancesVisible = !balancesVisible;
+    localStorage.setItem(BALANCE_VISIBILITY_KEY, balancesVisible.toString());
+    applyBalanceVisibility(balancesVisible);
+}
+// ===============================================
 // NAVIGATION MANAGEMENT
 // ===============================================
 
@@ -140,8 +179,8 @@ function initializeNavigation() {
     DEBUG.log('Navigazione inizializzata');
 }
 
-function changePage(page) {
-    DEBUG.log('Cambio pagina', { from: AppState.currentPage, to: page });
+function changePage(page, isInitialLoad = false) {
+    DEBUG.log('Cambio pagina', { from: AppState.currentPage, to: page, initial: isInitialLoad });
     
     // Nascondi tutte le pagine
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -165,7 +204,15 @@ function changePage(page) {
         updatePageTitle(page);
         
         // Logica specifica per pagina
-        setTimeout(() => handlePageChange(page), 100);
+        // Se è il caricamento iniziale e la pagina è addTransaction, non serve ricaricare tutto subito
+        // handlePageChange si occuperà di caricare i dati se necessario per altre pagine
+        if (!isInitialLoad || page !== 'addTransaction') {
+            setTimeout(() => handlePageChange(page), 50); // Ridotto timeout
+        } else if (isInitialLoad && page === 'addTransaction') {
+            // Assicurati che lo sticky submit sia visibile
+            showStickySubmit();
+            // Il titolo è già impostato dall'HTML e da updatePageTitle
+        }
     }
 }
 
@@ -175,6 +222,9 @@ function updatePageTitle(page) {
     
     if (titleEl && pageConfig) {
         titleEl.textContent = pageConfig.title;
+    } else if (titleEl && AppState.currentPage === 'addTransaction' && page === 'addTransaction') {
+        // Assicura che il titolo sia corretto all'avvio se la pagina di default è addTransaction
+        titleEl.textContent = PAGES.addTransaction.title;
     }
 }
 
@@ -655,6 +705,9 @@ function displayMonthlyStats(stats) {
         savingRateChangeEl.textContent = NumberUtils.formatPercentageChange(change);
         savingRateChangeEl.className = `stat-change ${getChangeClass(change)}`;
     }
+
+    // Applica visibilità saldi dopo aver aggiornato il DOM
+    applyBalanceVisibility(balancesVisible);
 }
 
 function calculateSavingRate(income, expenses) {
@@ -756,12 +809,12 @@ function updateAccountBalances() {
             accountsHTML += `
                 <div class="account-item">
                     <div class="account-name">${conto.nome}</div>
-                    <div class="account-balance ${balanceClass}">${NumberUtils.formatCurrency(saldo)}</div>
+                    <div class="account-balance ${balanceClass} balance-value">${NumberUtils.formatCurrency(saldo)}</div>
                 </div>
             `;
         });
         
-        totalBalanceEl.textContent = NumberUtils.formatCurrency(totalBalance);
+        if (totalBalanceEl) totalBalanceEl.textContent = NumberUtils.formatCurrency(totalBalance); // totalBalanceEl è già un .balance-value
         accountsListEl.innerHTML = accountsHTML;
         
         DEBUG.log('Saldi aggiornati', { totalBalance, accounts: AppState.datiSpreadsheet.conti.length });
@@ -769,6 +822,9 @@ function updateAccountBalances() {
         totalBalanceEl.textContent = NumberUtils.formatCurrency(0);
         accountsListEl.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">Nessun conto trovato</div>';
     }
+
+    // Applica visibilità saldi dopo aver aggiornato il DOM
+    applyBalanceVisibility(balancesVisible);
 }
 
 function updateRecentTransactions() {
