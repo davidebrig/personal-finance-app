@@ -5,7 +5,7 @@
 // Google Apps Script Configuration
 const CONFIG = {
     // URL del Google Apps Script
-    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzjvW0T2bhFVyJCyFEQcQ6CT17kGvVAO2eF8JOJgMA0VOnFxHtSFEzVwETf0QyeDmvU/exec',
+    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyJk8HiNRpdhQ0k6hpTIrKJ6o9W9RhUmlUjpR6aSB1zs9AQvq6Z2_TzfK5ajegJC0qA/exec',
     
     // ID del Google Sheet (per aprire il link diretto)
     GOOGLE_SHEET_ID: '1HbC77mPPxFm378OnJXqnoyRrEGzIp1WBooth37sZWXU',
@@ -20,7 +20,7 @@ const CONFIG = {
     
     // Impostazioni app
     APP_NAME: 'Finance App',
-    VERSION: '1.2 Simplified',
+    VERSION: '1.5 PWA',
     
     // Timeout per le richieste (in millisecondi)
     REQUEST_TIMEOUT: 30000,
