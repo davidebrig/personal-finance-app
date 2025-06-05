@@ -503,7 +503,11 @@ function loadSpreadsheetData() {
         .then(data => {
             if (data.success) {
                 AppState.datiSpreadsheet = data.data;
-                populateFormSelects();
+                // Popola solo i conti qui, le categorie verranno gestite da updateFieldVisibility
+                populateAccountSelects(); 
+                // Ora che i dati ci sono, aggiorna la visibilità e i filtri del form
+                // in base al tipo di transazione corrente.
+                updateFieldVisibility(); 
                 updateConnectionStatus(APP_STATES.SUCCESS, 'Connesso al Google Sheet');
                 updateLastConnectionTime();
                 
@@ -905,8 +909,8 @@ function showSubmitButton() {
 }
 
 function populateFormSelects() {
-    populateAccountSelects();
-    populateCategorySelects();
+    populateAccountSelects(); // Le categorie verranno popolate da updateFieldVisibility
+    // populateCategorySelects(); // Rimuoviamo questa chiamata da qui
 }
 
 function populateAccountSelects() {
@@ -957,22 +961,43 @@ function populateAccountSelects() {
     }
 }
 
-function populateCategorySelects() {
+function populateCategorySelects(filterTipo = null) {
     const selectCategoria = document.getElementById('categoria');
     if (!selectCategoria) return;
-    
-    const categorie = [...new Set(AppState.datiSpreadsheet.categorie.map(c => c.categoria))];
-    
+
     selectCategoria.innerHTML = '<option value="">Seleziona categoria...</option>';
-    
-    if (categorie.length > 0) {
-        categorie.forEach(categoria => {
-            const option = new Option(categoria, categoria);
-            selectCategoria.add(option);
-        });
-    } else {
-        selectCategoria.innerHTML = '<option value="">❌ Nessuna categoria trovata</option>';
+
+    let categorieDaMostrare = [];
+    if (AppState.datiSpreadsheet.categorie && AppState.datiSpreadsheet.categorie.length > 0) {
+        if (filterTipo) {
+            // Filtra le categorie in base al tipo (es. "spesa" o "entrata")
+            // Assumiamo che cat.tipo nello spreadsheet sia "Spesa", "Entrata"
+            // e filterTipo sia "spesa", "entrata"
+            const tipoNormalizzato = filterTipo.charAt(0).toUpperCase() + filterTipo.slice(1);
+            categorieDaMostrare = AppState.datiSpreadsheet.categorie
+                .filter(c => c.tipo === tipoNormalizzato)
+                .map(c => c.categoria);
+        } else {
+            // Mostra tutte le categorie se nessun filtro è applicato (o se i dati non sono pronti per il filtro)
+            categorieDaMostrare = AppState.datiSpreadsheet.categorie.map(c => c.categoria);
+        }
     }
+
+    const uniqueCategorie = [...new Set(categorieDaMostrare)].filter(c => c); // Rimuovi eventuali valori nulli o stringhe vuote
+
+    if (uniqueCategorie.length > 0) {
+        uniqueCategorie.forEach(categoria => {
+            if (categoria) { // Assicurati che la categoria non sia vuota
+                const option = new Option(categoria, categoria);
+                selectCategoria.add(option);
+            }
+        });
+        selectCategoria.disabled = false;
+    } else {
+        selectCategoria.innerHTML = filterTipo ? `<option value="">❌ Nessuna categoria per "${filterTipo}"</option>` : '<option value="">❌ Nessuna categoria</option>';
+        selectCategoria.disabled = true;
+    }
+    updateSubcategories(); // Aggiorna le sottocategorie in base alle nuove categorie
 }
 
 function updateButtonStyles() {
@@ -1015,19 +1040,40 @@ function updateFieldVisibility() {
     const tipoField = document.getElementById('tipo');
     const contoDestinazioneGroup = document.getElementById('contoDestinazioneGroup');
     const contoDestinazione = document.getElementById('contoDestinazione');
+    const categoriaGroup = document.getElementById('categoriaGroup');
+    const sottocategoriaGroup = document.getElementById('sottocategoriaGroup');
+    const categoriaField = document.getElementById('categoria');
+    const sottocategoriaField = document.getElementById('sottocategoria');
 
-    if (!tipoField) return;
-    
+    if (!tipoField || !categoriaGroup || !sottocategoriaGroup || !categoriaField || !sottocategoriaField) {
+        DEBUG.warn("Elementi del form mancanti per updateFieldVisibility");
+        return;
+    }
+
     const tipo = tipoField.value;
 
     if (tipo === TRANSACTION_TYPES.TRANSFER) {
+        // Gestione Trasferimento
         if (contoDestinazioneGroup) {
             contoDestinazioneGroup.classList.remove('hidden');
         }
         if (contoDestinazione) {
             contoDestinazione.required = true;
         }
+        // Nascondi e resetta Categoria e Sottocategoria
+        categoriaGroup.classList.add('hidden');
+        sottocategoriaGroup.classList.add('hidden');
+        categoriaField.required = false;
+        sottocategoriaField.required = false; 
+        categoriaField.innerHTML = '<option value="">N/A per Trasferimento</option>';
+        sottocategoriaField.innerHTML = '<option value="">N/A per Trasferimento</option>';
+        categoriaField.value = '';
+        sottocategoriaField.value = '';
+        categoriaField.disabled = true;
+        sottocategoriaField.disabled = true;
+
     } else {
+        // Gestione Spesa o Entrata
         if (contoDestinazioneGroup) {
             contoDestinazioneGroup.classList.add('hidden');
         }
@@ -1035,7 +1081,16 @@ function updateFieldVisibility() {
             contoDestinazione.required = false;
             contoDestinazione.value = '';
         }
+        // Mostra Categoria e Sottocategoria e popola Categorie
+        categoriaGroup.classList.remove('hidden');
+        sottocategoriaGroup.classList.remove('hidden');
+        categoriaField.required = true;
+        categoriaField.disabled = false;
+        sottocategoriaField.disabled = false;
+        populateCategorySelects(tipo); // Filtra le categorie per tipo "spesa" o "entrata"
     }
+    // Aggiorna lo stile dei bottoni submit in base al tipo
+    updateButtonStyles();
 }
 
 function updateSubcategories() {
@@ -1043,24 +1098,29 @@ function updateSubcategories() {
     const selectSottocategoria = document.getElementById('sottocategoria');
     
     if (!selectSottocategoria || !categoriaField) return;
-    
+
     const categoriaSelezionata = categoriaField.value;
-    
     selectSottocategoria.innerHTML = '<option value="">Seleziona sottocategoria...</option>';
+
+    // Se il campo categoria è disabilitato (es. per Trasferimento o nessuna categoria trovata), non fare nulla
+    if (categoriaField.disabled || !categoriaSelezionata) {
+        selectSottocategoria.innerHTML = categoriaField.disabled ? '<option value="">N/A</option>' : '<option value="">Prima seleziona categoria</option>';
+        return;
+    }
 
     if (categoriaSelezionata && AppState.datiSpreadsheet.categorie) {
         const sottocategorie = AppState.datiSpreadsheet.categorie
-            .filter(c => c.categoria === categoriaSelezionata)
+            .filter(c => c.categoria === categoriaSelezionata && c.sottocategoria) // Assicurati che la sottocategoria esista
             .map(c => c.sottocategoria)
             .filter(s => s);
 
         if (sottocategorie.length > 0) {
-            sottocategorie.forEach(sottocategoria => {
+            [...new Set(sottocategorie)].forEach(sottocategoria => { // Assicura unicità
                 const option = new Option(sottocategoria, sottocategoria);
                 selectSottocategoria.add(option);
             });
         } else {
-            selectSottocategoria.innerHTML = '<option value="">❌ Nessuna sottocategoria trovata</option>';
+            selectSottocategoria.innerHTML = '<option value="">Nessuna sottocategoria</option>';
         }
     }
 }
@@ -1267,11 +1327,28 @@ function createTransactions(data) {
         throw new Error('Importo non valido');
     }
     
+    // Determina la Classe basata sulla Categoria selezionata
+    let determinedClasse = '';
+    if (data.categoria && AppState.datiSpreadsheet.categorie) {
+        // Cerca la categoria nei dati caricati dallo spreadsheet
+        // AppState.datiSpreadsheet.categorie contiene oggetti con proprietà in minuscolo (es. cat.classe)
+        const categoriaInfo = AppState.datiSpreadsheet.categorie.find(
+            cat => cat.categoria === data.categoria
+        );
+        if (categoriaInfo && categoriaInfo.classe) {
+            determinedClasse = categoriaInfo.classe;
+        } else {
+            DEBUG.warn(`Classe non trovata per Categoria: ${data.categoria}. Verrà lasciata vuota.`);
+        }
+    }
+    
     const baseTransaction = {
         Data: data.data,
         Categoria: data.categoria,
+        Sottocategoria: data.sottocategoria || '',
         Descrizione: data.descrizione || '',
-        Etichetta: data.etichetta || ''
+        Etichetta: data.etichetta || '',
+        Classe: determinedClasse // header di Apps Script
     };
 
     switch(data.tipo) {
