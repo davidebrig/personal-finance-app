@@ -39,8 +39,7 @@
 
 </head>
 <body>
-    <div class="app-container">
-        <!-- Header -->
+    <!-- Header -->
         <header class="app-header">
             <h1 id="pageTitle" class="header-title">💰 Dashboard</h1>
             <div class="connection-status" id="connectionStatus">
@@ -48,7 +47,7 @@
                 <span class="status-text">Connessione...</span>
             </div>
         </header>
-
+    <div class="app-container">
         <!-- Main Content -->
         <main class="app-main">
             <!-- Dashboard Page -->
@@ -199,7 +198,7 @@
                         </div>
 
                         <!-- Category -->
-                        <div class="form-group">
+                        <div class="form-group" id="categoriaGroup">
                             <label class="form-label" for="categoria">Categoria</label>
                             <select id="categoria" name="categoria" class="form-select" required>
                                 <option value="">📡 Caricamento...</option>
@@ -207,7 +206,7 @@
                         </div>
 
                         <!-- Subcategory -->
-                        <div class="form-group">
+                        <div class="form-group" id="sottocategoriaGroup">
                             <label class="form-label" for="sottocategoria">Sottocategoria</label>
                             <select id="sottocategoria" name="sottocategoria" class="form-select">
                                 <option value="">Prima seleziona la categoria</option>
@@ -303,7 +302,7 @@
                         <div class="info-grid">
                             <div class="info-item">
                                 <span class="info-label">Versione</span>
-                                <span class="info-value">v1.2 Responsive</span>
+                                <span class="info-value">v1.5 PWA</span>
                             </div>
                             <div class="info-item">
                                 <span class="info-label">Ultima connessione</span>
