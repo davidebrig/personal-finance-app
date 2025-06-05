@@ -41,7 +41,10 @@
 <body>
     <!-- Header -->
         <header class="app-header">
-            <h1 id="pageTitle" class="header-title">💰 Dashboard</h1>
+            <button id="toggleBalanceVisibility" class="balance-toggle-btn" aria-label="Mostra saldi">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+            <h1 id="pageTitle" class="header-title">➕ Aggiungi Transazione</h1>
             <div class="connection-status" id="connectionStatus">
                 <span class="status-dot loading"></span>
                 <span class="status-text">Connessione...</span>
@@ -51,11 +54,11 @@
         <!-- Main Content -->
         <main class="app-main">
             <!-- Dashboard Page -->
-            <section id="dashboardPage" class="page active">
+            <section id="dashboardPage" class="page">
                 <div class="dashboard-grid">
                     <!-- Net Worth Card -->
                     <div class="balance-card">
-                        <div class="balance-amount" id="totalBalance">€ 0,00</div>
+                    <div class="balance-amount balance-value" id="totalBalance">€ 0,00</div>
                         <div class="balance-label">Net Worth</div>
                     </div>
 
@@ -64,7 +67,7 @@
                         <div class="stat-card stat-card--income">
                             <div class="stat-icon">📈</div>
                             <div class="stat-content">
-                                <div class="stat-value" id="monthlyIncome">€ 0</div>
+                            <div class="stat-value balance-value" id="monthlyIncome">€ 0</div>
                                 <div class="stat-label">Entrate mese</div>
                                 <div class="stat-change" id="incomeChange">+0%</div>
                             </div>
@@ -72,7 +75,7 @@
                         <div class="stat-card stat-card--expense">
                             <div class="stat-icon">📉</div>
                             <div class="stat-content">
-                                <div class="stat-value" id="monthlyExpenses">€ 0</div>
+                            <div class="stat-value balance-value" id="monthlyExpenses">€ 0</div>
                                 <div class="stat-label">Uscite mese</div>
                                 <div class="stat-change" id="expenseChange">+0%</div>
                             </div>
@@ -84,7 +87,7 @@
                         <div class="saving-rate-content">
                             <div class="saving-rate-icon">🎯</div>
                             <div class="saving-rate-info">
-                                <div class="saving-rate-value" id="savingRate">0%</div>
+                            <div class="saving-rate-value balance-value" id="savingRate">0%</div>
                                 <div class="saving-rate-label">Saving Rate</div>
                                 <div class="saving-rate-change" id="savingRateChange">+0%</div>
                             </div>
@@ -150,7 +153,7 @@
             </section>
 
             <!-- Add Transaction Page -->
-            <section id="addTransactionPage" class="page">
+            <section id="addTransactionPage" class="page active">
                 <div class="form-container">
                     <form id="transactionForm" class="transaction-form">
                         <!-- Transaction Type -->
@@ -320,7 +323,7 @@
 
         <!-- Bottom Navigation -->
         <nav class="bottom-nav">
-            <button class="nav-item active" data-page="dashboard">
+            <button class="nav-item" data-page="dashboard">
                 <span class="nav-icon">📊</span>
                 <span class="nav-label">Dashboard</span>
             </button>
@@ -328,7 +331,7 @@
                 <span class="nav-icon">💰</span>
                 <span class="nav-label">Transazioni</span>
             </button>
-            <button class="nav-item nav-item--add" data-page="addTransaction">
+            <button class="nav-item nav-item--add active" data-page="addTransaction">
                 <span class="nav-icon nav-icon--add">+</span>
                 <span class="nav-label">Aggiungi</span>
             </button>
