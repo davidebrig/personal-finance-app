@@ -45,6 +45,12 @@
                 <button id="toggleBalanceVisibility" class="balance-toggle-btn" aria-label="Mostra saldi">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                 </button>
+                <button id="closeEditBtn" class="balance-toggle-btn hidden" aria-label="Chiudi modifica" style="margin-left: 8px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
                 <h1 id="pageTitle" class="header-title">📊 Dashboard</h1>
             </div>
             <div class="connection-status" id="connectionStatus">
@@ -103,8 +109,8 @@
                     <!-- Analytics Card -->
                     <div class="analytics-card">
                         <div class="card-title">📊 Analytics Avanzate</div>
-                        <div class="analytics-content">
-                            <p>Visualizza report dettagliati e grafici avanzati</p>
+                        <div class="analytics-content analytics-content-row">
+                            <p class="analytics-subtitle">Visualizza report dettagliati e grafici avanzati</p>
                             <button class="btn btn--analytics" onclick="openLookerStudio()">
                                 🚀 Apri Dashboard
                             </button>
@@ -142,7 +148,7 @@
             <section id="transactionPage" class="page">
                 <!-- Il titolo della card ora è un titolo di sezione diretto -->
                 <div class="card-title section-title">
-                    💰 Ultime Transazioni
+                    Ultime Transazioni
                     <button class="btn btn--primary" onclick="changePage('addTransaction')">
                         <span>+</span> Nuova
                     </button>
@@ -249,15 +255,13 @@
                         <input type="date" id="data" name="data" class="form-input" required>
                     </div>
 
-                        <!-- Bottone Annulla Modifica (nascosto di default) -->
+                        <!-- Bottoni azione -->
                         <div class="form-group button-group">
-                            <button type="button" id="cancelEditBtn" class="btn btn--secondary hidden">Annulla Modifica</button>
+                            <button type="submit" id="submitBtn" class="btn btn--submit btn--expense">
+                                <span id="submitText">Salva Transazione</span>
+                                <span id="submitSpinner" class="spinner hidden"></span>
+                            </button>
                         </div>
-                        <!-- Bottone Submit Originale (nascosto da CSS, ma utile per JS e fallback) -->
-                        <button type="submit" id="submitBtn" class="btn btn--submit btn--expense">
-                            <span id="submitText">Salva Transazione</span>
-                            <span id="submitSpinner" class="spinner hidden"></span>
-                        </button>
                 </form>
                 <div id="message" class="message hidden"></div>
             </section>
