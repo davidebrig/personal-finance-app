@@ -2,17 +2,17 @@
 // FINANCE APP - CONFIGURATION SIMPLIFIED
 // ===============================================
 
-// Google Apps Script Configuration
+// Default Configuration
 const CONFIG = {
     // URL del Google Apps Script
-    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyJk8HiNRpdhQ0k6hpTIrKJ6o9W9RhUmlUjpR6aSB1zs9AQvq6Z2_TzfK5ajegJC0qA/exec',
+    DEFAULT_GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyrTIRJ6ZHrvgqj1hN4iPQrBvarT436if2z_RqgY5TxFn6ZQPY54sypVwCKnu2MUtfU/exec',
     
     // ID del Google Sheet (per aprire il link diretto)
-    GOOGLE_SHEET_ID: '1HbC77mPPxFm378OnJXqnoyRrEGzIp1WBooth37sZWXU',
+    DEFAULT_GOOGLE_SHEET_ID: '1HbC77mPPxFm378OnJXqnoyRrEGzIp1WBooth37sZWXU',
     
     // URL diretto del Google Sheet
-    get GOOGLE_SHEET_URL() {
-        return `https://docs.google.com/spreadsheets/d/${this.GOOGLE_SHEET_ID}/edit`;
+    get DEFAULT_GOOGLE_SHEET_URL() {
+        return `https://docs.google.com/spreadsheets/d/${this.DEFAULT_GOOGLE_SHEET_ID}/edit`;
     },
     
     // URL Looker Studio Dashboard (SOSTITUISCI CON IL TUO URL)
