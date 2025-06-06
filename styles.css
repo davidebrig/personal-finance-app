@@ -204,21 +204,24 @@ body {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-light);
-  padding: var(--space-xs) var(--space-md);
+  padding: 4px 12px;
   border-radius: var(--radius-full);
-  background-color: var(--color-surface); /* Use surface color */
-  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  border: 1.2px solid var(--color-border);
   transition: var(--transition-normal);
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
+  box-shadow: 0 1.5px 6px rgba(16,185,129,0.04), 0 1px 6px rgba(239,68,68,0.04);
 }
 
 .connection-status:hover {
-  background-color: #383838; /* Slightly lighter dark for hover */
-  transform: translateY(-1px);
+  background-color: #383838;
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 16px rgba(59,130,246,0.10);
 }
 
 .connection-status.success {
@@ -242,23 +245,43 @@ body {
 }
 
 .status-dot {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   border-radius: var(--radius-full);
   flex-shrink: 0;
+  box-shadow: 0 0 6px 1.5px rgba(16,185,129,0.10), 0 0 6px 1.5px rgba(239,68,68,0.10);
+  margin-right: var(--space-xs);
+  transition: box-shadow 0.3s;
 }
 
 .status-dot.loading {
   background-color: var(--color-warning);
-  animation: pulse 1.5s infinite;
+  animation: status-pulse 1.2s infinite cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 0 12px 4px var(--color-warning-light);
+}
+
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 12px 4px var(--color-warning-light); }
+  50% { opacity: 0.6; box-shadow: 0 0 20px 8px var(--color-warning); }
 }
 
 .status-dot.success {
   background-color: var(--color-success);
+  box-shadow: 0 0 12px 4px var(--color-success-light);
 }
 
 .status-dot.error {
   background-color: var(--color-error);
+  box-shadow: 0 0 12px 4px var(--color-error-light);
+}
+
+.status-text {
+  margin-left: var(--space-xs);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.01em;
+  color: inherit;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.12);
 }
 
 /* MAIN CONTENT */
@@ -303,7 +326,7 @@ body {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-light);
-  text-align: center;
+  text-align: left;
   margin-bottom: var(--space-lg);
   display: none; /* Nascosto di default, mostrato da JS */
 }
@@ -592,6 +615,24 @@ body {
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1); /* Reduced opacity for dark */
 }
 
+.analytics-content-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+  text-align: left;
+}
+
+.analytics-subtitle {
+  margin: 0;
+  font-size: var(--font-size-base);
+  color: #e0e0e0;
+  flex: 1;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
 .analytics-card .card-title {
   color: #ffffff; /* White text on blue is fine */
 }
@@ -829,6 +870,13 @@ body {
   overflow: hidden;
 }
 
+.tipo-btn--readonly {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  filter: grayscale(0.5);
+}
+
 .tipo-btn::before {
   content: '';
   position: absolute;
@@ -1038,6 +1086,11 @@ body {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
   margin-bottom: var(--space-xs);
+  margin-right: 12px;
+}
+
+.transactions-list .transaction-amount {
+  margin-right: 16px;
 }
 
 .transaction-amount.expense {
@@ -1055,7 +1108,12 @@ body {
 .transaction-account {
   font-size: var(--font-size-xs);
   color: var(--color-text-light);
-    }
+  margin-right: 12px;
+}
+
+.transactions-list .transaction-account {
+  margin-right: 16px;
+}
     
 /* Azioni per le transazioni (Modifica/Elimina) */
 .transaction-item {
@@ -1204,6 +1262,10 @@ body {
 .settings-sublabel {
   font-size: var(--font-size-sm);
   color: var(--color-text-light);
+  display: block;
+  width: 100%;
+  margin-top: 2px;
+  line-height: 1.4;
 }
 
 .info-grid {
@@ -1301,13 +1363,13 @@ body {
   /* Reset di tutti i valori che potrebbero interferire */
   all: unset;
   
-  /* Dimensioni fisse */
-  width: 56px !important;
-  height: 56px !important;
-  min-width: 56px !important;
-  max-width: 56px !important;
-  min-height: 56px !important;
-  max-height: 56px !important;
+  /* Dimensioni fisse ridotte */
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  max-width: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
   
   /* Centra nel grid */
   justify-self: center;
@@ -1326,7 +1388,7 @@ body {
   
   /* Posizionamento */
   position: relative;
-  margin-top: -8px;
+  margin-top: -4px;
   
   /* Previeni deformazioni */
   flex-shrink: 0;
@@ -1549,17 +1611,17 @@ body {
   }
   
   .nav-item--add {
-    width: 50px !important;
-    height: 50px !important;
-    min-width: 50px !important;
-    max-width: 50px !important;
-    min-height: 50px !important;
-    max-height: 50px !important;
-    margin-top: -6px;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    margin-top: -4px;
   }
   
   .nav-icon--add {
-    font-size: 24px;
+    font-size: 20px;
   }
 }
 
@@ -1591,16 +1653,17 @@ body {
   }
 
   .bottom-nav {
-    /* Rimuove il posizionamento fisso agganciato al fondo */
-    /* position: fixed; */ /* Già presente, ma lo modifichiamo */
-    bottom: var(--space-lg); /* Stacca dal fondo */
-    padding: var(--space-md) var(--space-xl);
-    max-width: 580px; /* Riduci la larghezza per un effetto floating più evidente */
-    left: 50%;
-    transform: translateX(-50%);
-    border-radius: var(--radius-2xl); /* Arrotonda tutti gli angoli */
-    box-shadow: var(--shadow-xl); /* Ombra più pronunciata per effetto floating */
-    border-top: none; /* Rimuove il bordo superiore non più necessario */
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 100%;
+    padding: var(--space-sm) var(--space-xs);
+    border-radius: 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    border-top: 1px solid var(--color-border);
+    transform: none;
   }
   
   .nav-item {
@@ -1609,7 +1672,12 @@ body {
   }
   
   .nav-item--add {
-    /* Rimuovi il margin-top che sposta il bottone + */
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
     margin-top: 0;
   }
 
@@ -1619,26 +1687,16 @@ body {
   }
 
   /* Fix definitivo per desktop */
-  .nav-item--add {
-    width: 54px !important;
-    height: 60px !important;
-    min-width: 60px !important;
-    max-width: 60px !important;
-    min-height: 60px !important;
-    max-height: 60px !important;
-    margin-top: -10px;
-  }
-
   .nav-icon--add {
-    font-size: 30px;
+    font-size: 24px;
   }
 
   .sticky-submit {
-    max-width: 580px; /* Mantieni la larghezza della bottom-bar */
-    left: 50%;
-    transform: translateX(-50%);
-    padding: var(--space-md) var(--space-xl);
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0; /* Mantieni angoli arrotondati solo in alto */
+    max-width: 100%;
+    left: 0;
+    transform: none;
+    padding: var(--space-lg);
+    border-radius: 0;
   }
 
   /* Aggiusta il padding del main content per la barra floating */
@@ -1667,12 +1725,12 @@ body {
   }
 
   .nav-item--add {
-    width: 54px !important;
-    height: 54px !important;
-    min-width: 54px !important;
-    max-width: 54px !important;
-    min-height: 54px !important;
-    max-height: 54px !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
   }
 
   .nav-item--add:hover {
@@ -1711,7 +1769,7 @@ body {
   .app-main {
     max-width: 1000px;
     margin: 0 auto;
-    padding: var(--space-xl) var(--space-xl) calc(var(--bottom-nav-height) + var(--space-lg) + var(--space-xl)); /* Aggiusta il padding per la nav fluttuante */
+    padding: var(--space-xl) var(--space-xl) calc(var(--bottom-nav-height) + var(--space-xl));
   }
 
   .app-main.with-sticky-submit {
@@ -1749,17 +1807,17 @@ body {
   }
   
   .nav-item--add {
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-    max-width: 44px !important;
-    min-height: 44px !important;
-    max-height: 44px !important;
-    margin-top: -4px;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    margin-top: -2px;
   }
   
   .nav-icon--add {
-    font-size: 22px;
+    font-size: 18px;
   }
 }
 
