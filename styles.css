@@ -227,6 +227,14 @@ body {
   color: var(--color-success); /* Use success color for text */
 }
 
+#headerCenter {
+  display: flex; /* Dispone gli elementi figli (pulsante e titolo) in riga. */
+  align-items: center; /* Allinea verticalmente gli elementi figli al centro della riga. */
+  justify-content: center; /* Centra orizzontalmente il gruppo pulsante+titolo all'interno di #headerCenter. */
+  gap: 8px; /* Aggiunge un piccolo spazio tra il pulsante e il titolo. Puoi regolare questo valore se necessario. */
+}
+
+
 .connection-status.error {
   background-color: var(--color-error-light);
   border-color: var(--color-error);
@@ -290,6 +298,16 @@ body {
   }
 }
 
+/* WELCOME MESSAGE - DASHBOARD */
+.welcome-message {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-light);
+  text-align: center;
+  margin-bottom: var(--space-lg);
+  display: none; /* Nascosto di default, mostrato da JS */
+}
+
 /* CARD COMPONENT */
 .card {
   background-color: var(--color-surface);
@@ -316,6 +334,12 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: var(--space-md);
+}
+
+/* Stile per i titoli di sezione che non sono dentro una card */
+.section-title {
+  /* Mantiene lo stile di .card-title ma aggiunge un margine inferiore se necessario */
+  margin-bottom: var(--space-xl); /* Aumenta un po' lo spazio sotto il titolo di sezione */
 }
 
 /* DASHBOARD GRID */
@@ -606,7 +630,7 @@ body {
   white-space: nowrap;
   user-select: none;
   outline: none;
-  min-height: 50px !important;
+  min-height: 50px;
   font-family: inherit;
   position: relative;
   overflow: hidden;
@@ -664,7 +688,7 @@ body {
 }
 
 #submitBtn {
-  display: none !important;
+  display: none; /* Considera se questa regola è ancora necessaria o se la visibilità è gestita da .sticky-submit */
 }
 
 .btn--expense {
@@ -700,6 +724,7 @@ body {
 
 .transaction-form {
   width: 100%;
+  margin-bottom: var(--space-lg); /* Aggiunge spazio sotto il form prima del messaggio o fine pagina */
 }
 
 .form-group {
@@ -952,6 +977,11 @@ body {
   border-bottom: 1px solid var(--color-border-light);
   transition: var(--transition-normal);
   position: relative;
+      /* Rimuoviamo il padding-left qui se le azioni sono all'interno e gestite da flex */
+    }
+    
+    .transaction-item {
+      /* Assicurati che transaction-item sia flex per allineare le azioni */
   padding-left: var(--space-lg);
 }
 
@@ -970,6 +1000,7 @@ body {
 
 .transaction-item:last-child {
   border-bottom: none;
+      padding-bottom: 0; /* Rimuovi padding extra se è l'ultimo */
 }
 
 .transaction-left {
@@ -1024,6 +1055,60 @@ body {
 .transaction-account {
   font-size: var(--font-size-xs);
   color: var(--color-text-light);
+    }
+    
+/* Azioni per le transazioni (Modifica/Elimina) */
+.transaction-item {
+    /* display: flex; è già implicito o può essere aggiunto se necessario per il layout interno */
+    /* align-items: center; è già implicito o può essere aggiunto */
+}
+
+.transaction-actions {
+    display: flex;
+    align-items: center;
+    /* margin-left: var(--space-md); Rimosso, useremo gap */
+    flex-shrink: 0; /* Non far restringere i bottoni */
+    gap: var(--space-sm); /* Spazio tra i bottoni stessi */
+}
+
+.transaction-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0; /* Rimuoviamo il padding, le dimensioni fisse gestiranno lo spazio */
+    color: var(--color-text-muted); /* Colore di default per le icone */
+    border-radius: var(--radius-md);
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+    width: 32px; /* Larghezza fissa, simile a balance-toggle-btn */
+    height: 32px; /* Altezza fissa, simile a balance-toggle-btn */
+    display: inline-flex; /* Per centrare l'emoji */
+    align-items: center; /* Centra verticalmente l'emoji */
+    justify-content: center; /* Centra orizzontalmente l'emoji */
+}
+
+.transaction-actions button svg {
+    width: 18px; /* Dimensione dell'icona SVG */
+    height: 18px; /* Dimensione dell'icona SVG */
+    stroke: currentColor; /* Eredita il colore dal bottone (per icone outline) */
+    /* fill: currentColor; */ /* In alternativa, se usi icone SVG di tipo "fill" */
+}
+
+.transaction-actions button:hover {
+    background-color: rgba(255, 255, 255, 0.05); /* Sfondo leggero su hover, come balance-toggle-btn */
+    /* Il colore dell'icona cambierà specificamente per edit/delete */
+}
+
+.transaction-actions .btn-edit:hover {
+    color: var(--color-info); /* Blu per modifica, mantenuto */
+}
+
+.transaction-actions .btn-delete:hover {
+    color: var(--color-error); /* Rosso per elimina */
+}
+
+/* Per i bottoni nella dashboard, potrebbero essere più piccoli o diversi */
+.dashboard-actions button {
+    /* Puoi aggiungere stili specifici se necessario, es. font-size: 0.9em; */
 }
 
 /* Classe per nascondere i saldi con effetto blur migliorato */
@@ -1714,4 +1799,62 @@ body {
   .spinner {
     animation: none;
   }
+}
+
+/* Toggle Switch CSS (per pagina Impostazioni) */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px; /* Larghezza ridotta */
+  height: 28px; /* Altezza ridotta */
+  flex-shrink: 0; /* Evita che si restringa in flex container */
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #4A4A4A; /* Colore base scuro per lo slider spento */
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px; /* Dimensione del pallino ridotta */
+  width: 20px;  /* Dimensione del pallino ridotta */
+  left: 4px;
+  bottom: 4px;
+  background-color: var(--color-text); /* Pallino chiaro */
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: var(--color-primary); /* Colore primario quando acceso */
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(22px); /* Spostamento ridotto */
+  -ms-transform: translateX(22px);  /* Spostamento ridotto */
+  transform: translateX(22px);   /* Spostamento ridotto */
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 28px; /* Altezza del contenitore */
+}
+
+.slider.round:before {
+  border-radius: 50%;
 }
