@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
     DEBUG.log('Inizializzazione app completa...');
     
     initializeApp();
-    loadSpreadsheetData(false);
+    loadSpreadsheetData();
 });
 
 function initializeApp() {
@@ -342,6 +342,11 @@ function initializeNavigation() {
 
 function changePage(page, isInitialLoad = false) {
     DEBUG.log('Cambio pagina', { from: AppState.currentPage, to: page, initial: isInitialLoad });
+
+    // Se sto uscendo dalla pagina di modifica (addTransaction) e la modalità modifica è attiva, resetta la modalità modifica
+    if (AppState.currentPage === 'addTransaction' && page !== 'addTransaction' && AppState.editingTransactionId) {
+        resetTransactionForm();
+    }
     
     // Nascondi tutte le pagine
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -390,12 +395,19 @@ function changePage(page, isInitialLoad = false) {
 function updatePageTitle(page) {
     const titleEl = document.getElementById('pageTitle');
     const pageConfig = PAGES[page];
-    
-    if (titleEl && pageConfig) {
-        titleEl.textContent = pageConfig.title;
-    } else if (titleEl && AppState.currentPage === 'addTransaction' && page === 'addTransaction') {
-        // Assicura che il titolo sia corretto all'avvio se la pagina di default è addTransaction
-        titleEl.textContent = PAGES.addTransaction.title;
+    const closeEditBtn = document.getElementById('closeEditBtn');
+    if (titleEl) {
+        if (page === 'addTransaction' && AppState.editingTransactionId) {
+            titleEl.textContent = 'Modifica';
+            if (closeEditBtn) closeEditBtn.classList.remove('hidden');
+        } else if (pageConfig) {
+            titleEl.textContent = pageConfig.title;
+            if (closeEditBtn) closeEditBtn.classList.add('hidden');
+        } else if (AppState.currentPage === 'addTransaction' && page === 'addTransaction') {
+            // Assicura che il titolo sia corretto all'avvio se la pagina di default è addTransaction
+            titleEl.textContent = PAGES.addTransaction.title;
+            if (closeEditBtn) closeEditBtn.classList.add('hidden');
+        }
     }
 }
 
@@ -681,8 +693,12 @@ function displayTransactionsList(transactions) {
                     <div class="transaction-account">${transaction.Conto || ''}</div>
                 </div>
                 <div class="transaction-actions">
-                    <button class="btn-edit" onclick="initiateEditTransaction('${transactionId}')" aria-label="Modifica transazione">✏️</button>
-                    <button class="btn-delete" onclick="confirmDeleteTransaction('${transactionId}')" aria-label="Elimina transazione">🗑️</button>
+                    <button class="btn-edit" onclick="initiateEditTransaction('${transactionId}')" aria-label="Modifica transazione">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19.5 3 21l1.5-4L16.5 3.5z"/></svg>
+                    </button>
+                    <button class="btn-delete" onclick="confirmDeleteTransaction('${transactionId}')" aria-label="Elimina transazione">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    </button>
                 </div>
             </div>
         `;
@@ -739,9 +755,9 @@ function initializeAmountInput() {
 // DATA MANAGEMENT
 // ===============================================
 
-async function loadSpreadsheetData(showLoading = true) {
+async function loadSpreadsheetData() {
     updateConnectionStatus(APP_STATES.LOADING, 'Caricamento dati...');
-    if (showLoading) showGlobalLoading();
+    showGlobalLoading();
     try {
         const response = await fetch(AppState.userConfig.googleAppsScriptUrl + '?action=getInitialData');
         if (!response.ok) {
@@ -777,7 +793,7 @@ async function loadSpreadsheetData(showLoading = true) {
         updateConnectionStatus(APP_STATES.ERROR, 'Errore di connessione');
         showMessage('error', 'Impossibile collegarsi al Google Sheet: ' + error.message);
     } finally {
-        if (showLoading) hideGlobalLoading();
+        hideGlobalLoading();
     }
 }
 
@@ -1070,8 +1086,12 @@ function displayRecentTransactions(transactions) {
                 </div>
                 <div class="transaction-amount ${amountClass}">${displayAmount}</div>
                 <div class="transaction-actions dashboard-actions">
-                    <button class="btn-edit" onclick="initiateEditTransaction('${transactionId}')" aria-label="Modifica transazione">✏️</button>
-                    <button class="btn-delete" onclick="confirmDeleteTransaction('${transactionId}')" aria-label="Elimina transazione">🗑️</button>
+                    <button class="btn-edit" onclick="initiateEditTransaction('${transactionId}')" aria-label="Modifica transazione">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19.5 3 21l1.5-4L16.5 3.5z"/></svg>
+                    </button>
+                    <button class="btn-delete" onclick="confirmDeleteTransaction('${transactionId}')" aria-label="Elimina transazione">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    </button>
                 </div>
             </div>    
         `;
@@ -1160,6 +1180,11 @@ function initializeTransactionForm() {
     const cancelEditBtn = document.getElementById('cancelEditBtn');
     if (cancelEditBtn) {
         cancelEditBtn.addEventListener('click', cancelEditMode);
+    }
+    // Bottone X chiudi modifica
+    const closeEditBtn = document.getElementById('closeEditBtn');
+    if (closeEditBtn) {
+        closeEditBtn.addEventListener('click', cancelEditMode);
     }
 
     showSubmitButton();
@@ -1694,12 +1719,16 @@ function populateFormForEdit(transaction) {
     document.getElementById('tipo').value = tipoToSet;
     document.querySelectorAll('.tipo-btn').forEach(btn => {
         btn.classList.remove('active');
+        btn.classList.remove('tipo-btn--readonly');
         if (btn.dataset.tipo === tipoToSet) {
             btn.classList.add('active');
         }
-        // Disabilita i bottoni del tipo in modalità modifica
+        // Disabilita e schiarisci i bottoni del tipo in modalità modifica
         if (AppState.editingTransactionId) {
             btn.disabled = true;
+            btn.classList.add('tipo-btn--readonly');
+        } else {
+            btn.disabled = false;
         }
     });
     updateFieldVisibility(); // Questo popolerà anche le categorie corrette
@@ -1872,7 +1901,7 @@ async function submitTransactions(transactions, submitTextEl, submitSpinnerEl) {
             }
             // Ricarica i dati per aggiornare i saldi e dashboard
             setTimeout(() => {
-                loadSpreadsheetData(false);
+                loadSpreadsheetData();
             }, 1000);
             DEBUG.log('Transazioni registrate con successo', data);
         } else {
@@ -1909,7 +1938,7 @@ async function submitEditTransactionOnServer(transactionId, updatedData, submitT
             resetTransactionForm(); // Questo resetta anche AppState.editingTransactionId
             // Ricarica i dati per aggiornare saldi e dashboard
             setTimeout(() => {
-                loadSpreadsheetData(false);
+                loadSpreadsheetData();
             }, 1000);
             DEBUG.log('Transazione modificata con successo', result);
         } else {
@@ -1941,6 +1970,7 @@ function resetTransactionForm() {
     const expenseBtn = document.querySelector('.tipo-btn--expense');
     document.querySelectorAll('.tipo-btn').forEach(btn => {
         btn.classList.remove('active');
+        btn.classList.remove('tipo-btn--readonly');
         btn.disabled = false; // Riabilita i bottoni del tipo
     });
 
@@ -2112,7 +2142,7 @@ function updateWelcomeMessage() {
     const welcomeMessageEl = document.getElementById('welcomeMessage');
     if (welcomeMessageEl) {
         if (AppState.userPreferences.userName) {
-            welcomeMessageEl.textContent = `Ciao ${AppState.userPreferences.userName}!`;
+            welcomeMessageEl.textContent = `Ciao ${AppState.userPreferences.userName}! 👋`;
             welcomeMessageEl.style.display = 'block';
         } else {
             welcomeMessageEl.style.display = 'none';        }
@@ -2133,6 +2163,23 @@ function populateBackendConfigInputs() {
     if (lookerUrlInput) lookerUrlInput.value = AppState.userConfig.lookerStudioUrl || ''; // Gestisce null
 }
 
+function showBackendConfigMessage(type, text) {
+    const messageEl = document.getElementById('backendConfigMessage');
+    if (!messageEl) return;
+    messageEl.className = `message ${type}`;
+    messageEl.textContent = text;
+    messageEl.style.display = 'block';
+    messageEl.classList.remove('hidden');
+    let duration = CONFIG.UI.SUCCESS_MESSAGE_DURATION;
+    if (type === 'error') {
+        duration = CONFIG.UI.ERROR_MESSAGE_DURATION;
+    }
+    setTimeout(() => {
+        messageEl.style.display = 'none';
+        messageEl.classList.add('hidden');
+    }, duration);
+}
+
 function saveBackendConfig() {
     const appsScriptUrlInput = document.getElementById('appsScriptUrlInput');
     const sheetIdInput = document.getElementById('sheetIdInput');
@@ -2144,7 +2191,7 @@ function saveBackendConfig() {
 
     // Validazione semplice (puoi espanderla)
     if (!newAppsScriptUrl || !newSheetId) {
-        showPersonalizationMessage('error', 'URL Apps Script e ID Foglio Google sono obbligatori.'); // Potrebbe servire un messageEl diverso
+        showBackendConfigMessage('error', 'URL Apps Script e ID Foglio Google sono obbligatori.');
         return;
     }
 
@@ -2156,7 +2203,7 @@ function saveBackendConfig() {
     localStorage.setItem(SHEET_ID_KEY, newSheetId);
     localStorage.setItem(LOOKER_URL_KEY, newLookerUrl);
 
-    showPersonalizationMessage('success', 'Configurazioni backend salvate. Ricarica i dati se necessario.'); // Potrebbe servire un messageEl diverso
+    showBackendConfigMessage('success', 'Configurazioni backend salvate. Ricarica i dati se necessario.');
     DEBUG.log('Configurazioni backend salvate:', AppState.userConfig);
 
     // Potresti voler forzare un ricaricamento dei dati o avvisare l'utente di farlo
