@@ -5,7 +5,7 @@
 // Default Configuration
 const CONFIG = {
     // URL del Google Apps Script
-    DEFAULT_GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyrTIRJ6ZHrvgqj1hN4iPQrBvarT436if2z_RqgY5TxFn6ZQPY54sypVwCKnu2MUtfU/exec',
+    DEFAULT_GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzTD5OUOhZY1cysHQlx9jFilS5i6z-OGzr8FJKbq8VzRC17vMkVoQzqJfcw8dGZHR0_/exec',
     
     // ID del Google Sheet (per aprire il link diretto)
     DEFAULT_GOOGLE_SHEET_ID: '1HbC77mPPxFm378OnJXqnoyRrEGzIp1WBooth37sZWXU',
@@ -48,7 +48,7 @@ const CONFIG = {
     
     // Impostazioni transazioni
     TRANSACTIONS: {
-        LIST_LIMIT: 10,
+        LIST_LIMIT: 15,
         AUTO_REFRESH: true
     }
 };
@@ -77,12 +77,12 @@ const PAGES = {
         label: 'Transazioni'
     },
     addTransaction: {
-        title: '➕ Nuova Transazione',
-        icon: '➕',
+        title: '💸 Aggiungi Transazione',
+        icon: '💸',
         label: 'Aggiungi'
     },
     shared: {
-        title: '👥 Transazioni Condivise',
+        title: '👥 Condivise',
         icon: '👥',
         label: 'Condivise'
     },
