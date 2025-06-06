@@ -5,7 +5,16 @@ const urlsToCache = [
   './index.html',
   './styles.css',
   './app.js',
-  './config.js'
+  './config.js',
+  // Icone PWA
+  './icons/icon-48.png',
+  './icons/icon-72.png',
+  './icons/icon-96.png',
+  './icons/icon-144.png',
+  './icons/icon-192.png',
+  './icons/icon-384.png',
+  './icons/icon-512.png',
+  './icons/icon-add.png'
 ];
 
 // Installa il service worker
@@ -49,6 +58,10 @@ self.addEventListener('fetch', event => {
       })
       .catch(() => {
         // Se offline, usa la cache
+        // Se la richiesta è per una pagina HTML, mostra fallback
+        if (event.request.headers.get('accept')?.includes('text/html')) {
+          return caches.match('./index.html');
+        }
         return caches.match(event.request);
       })
   );
