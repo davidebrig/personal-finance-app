@@ -41,10 +41,12 @@
 <body>
     <!-- Header -->
         <header class="app-header">
-            <button id="toggleBalanceVisibility" class="balance-toggle-btn" aria-label="Mostra saldi">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            </button>
-            <h1 id="pageTitle" class="header-title">➕ Aggiungi Transazione</h1>
+            <div class="header-center" id="headerCenter">
+                <button id="toggleBalanceVisibility" class="balance-toggle-btn" aria-label="Mostra saldi">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
+                <h1 id="pageTitle" class="header-title">📊 Dashboard</h1>
+            </div>
             <div class="connection-status" id="connectionStatus">
                 <span class="status-dot loading"></span>
                 <span class="status-text">Connessione...</span>
@@ -54,7 +56,8 @@
         <!-- Main Content -->
         <main class="app-main">
             <!-- Dashboard Page -->
-            <section id="dashboardPage" class="page">
+            <section id="dashboardPage" class="page active">
+                <div class="welcome-message" id="welcomeMessage"></div>
                 <div class="dashboard-grid">
                     <!-- Net Worth Card -->
                     <div class="balance-card">
@@ -137,28 +140,26 @@
 
             <!-- Transactions Page -->
             <section id="transactionPage" class="page">
-                <div class="card">
-                    <div class="card-title">
-                        💰 Ultime Transazioni
-                        <button class="btn btn--primary" onclick="changePage('addTransaction')">
-                            <span>+</span> Nuova
-                        </button>
-                    </div>
-                    <div class="transactions-list" id="transactionsList">
-                        <div class="skeleton skeleton--text"></div>
-                        <div class="skeleton skeleton--text"></div>
-                        <div class="skeleton skeleton--text"></div>
-                    </div>
+                <!-- Il titolo della card ora è un titolo di sezione diretto -->
+                <div class="card-title section-title">
+                    💰 Ultime Transazioni
+                    <button class="btn btn--primary" onclick="changePage('addTransaction')">
+                        <span>+</span> Nuova
+                    </button>
+                </div>
+                <div class="transactions-list" id="transactionsList">
+                    <div class="skeleton skeleton--text"></div>
+                    <div class="skeleton skeleton--text"></div>
+                    <div class="skeleton skeleton--text"></div>
                 </div>
             </section>
 
             <!-- Add Transaction Page -->
-            <section id="addTransactionPage" class="page active">
-                <div class="form-container">
-                    <form id="transactionForm" class="transaction-form">
-                        <!-- Transaction Type -->
-                        <div class="form-group">
-                            <div class="tipo-buttons">
+            <section id="addTransactionPage" class="page">
+                <form id="transactionForm" class="transaction-form">
+                    <!-- Transaction Type -->
+                    <div class="form-group">
+                        <div class="tipo-buttons">
                                 <button type="button" class="tipo-btn tipo-btn--expense active" data-tipo="spesa">
                                     📤 Spesa
                                 </button>
@@ -168,90 +169,97 @@
                                 <button type="button" class="tipo-btn tipo-btn--transfer" data-tipo="trasferimento">
                                     🔄 Trasferimento
                                 </button>
+                        </div>
+                        <input type="hidden" id="tipo" name="tipo" value="spesa">
+                    </div>
+
+                    <!-- Amount -->
+                    <div class="form-group form-group--amount">
+                        <label class="form-label form-label--large" for="importo">Importo €</label>
+                        <input type="text" 
+                               id="importo" 
+                               name="importo" 
+                               class="form-input form-input--amount"
+                               placeholder="0,00"
+                               inputmode="decimal"
+                               required>
+                    </div>
+
+                    <!-- Account -->
+                    <div class="form-group">
+                        <label class="form-label" for="conto">Conto</label>
+                        <select id="conto" name="conto" class="form-select" required>
+                            <option value="">📡 Caricamento...</option>
+                        </select>
+                    </div>
+
+                    <!-- Destination Account (hidden by default) -->
+                    <div class="form-group hidden" id="contoDestinazioneGroup">
+                        <label class="form-label" for="contoDestinazione">Conto destinazione</label>
+                        <select id="contoDestinazione" name="contoDestinazione" class="form-select">
+                            <option value="">Seleziona destinazione...</option>
+                        </select>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="form-group" id="categoriaGroup">
+                        <label class="form-label" for="categoria">Categoria</label>
+                        <select id="categoria" name="categoria" class="form-select" required>
+                            <option value="">📡 Caricamento...</option>
+                        </select>
+                    </div>
+
+                    <!-- Subcategory -->
+                    <div class="form-group" id="sottocategoriaGroup">
+                        <label class="form-label" for="sottocategoria">Sottocategoria</label>
+                        <select id="sottocategoria" name="sottocategoria" class="form-select">
+                            <option value="">Prima seleziona la categoria</option>
+                        </select>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group autocomplete-container">
+                        <label class="form-label" for="descrizione">Descrizione</label>
+                        <input type="text" 
+                               id="descrizione" 
+                               name="descrizione" 
+                               class="form-input"
+                               placeholder="Inizia a scrivere..."
+                               autocomplete="off">
+                        <div id="descrizioneSuggestions" class="autocomplete-suggestions"></div>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="form-group">
+                        <label class="form-label">Etichette</label>
+                        <div class="tags-container">
+                            <div class="tags-display" id="tagsDisplay">
+                                <input type="text" 
+                                       class="tags-input" 
+                                       id="tagsInput" 
+                                       placeholder="Aggiungi etichetta e premi Invio">
                             </div>
-                            <input type="hidden" id="tipo" name="tipo" value="spesa">
+                            <input type="hidden" id="etichetta" name="etichetta">
                         </div>
+                    </div>
 
-                        <!-- Amount -->
-                        <div class="form-group form-group--amount">
-                            <label class="form-label form-label--large" for="importo">Importo €</label>
-                            <input type="text" 
-                                   id="importo" 
-                                   name="importo" 
-                                   class="form-input form-input--amount"
-                                   placeholder="0,00"
-                                   inputmode="decimal"
-                                   required>
+                    <!-- Date -->
+                    <div class="form-group">
+                        <label class="form-label" for="data">Data</label>
+                        <input type="date" id="data" name="data" class="form-input" required>
+                    </div>
+
+                        <!-- Bottone Annulla Modifica (nascosto di default) -->
+                        <div class="form-group button-group">
+                            <button type="button" id="cancelEditBtn" class="btn btn--secondary hidden">Annulla Modifica</button>
                         </div>
-
-                        <!-- Account -->
-                        <div class="form-group">
-                            <label class="form-label" for="conto">Conto</label>
-                            <select id="conto" name="conto" class="form-select" required>
-                                <option value="">📡 Caricamento...</option>
-                            </select>
-                        </div>
-
-                        <!-- Destination Account (hidden by default) -->
-                        <div class="form-group hidden" id="contoDestinazioneGroup">
-                            <label class="form-label" for="contoDestinazione">Conto destinazione</label>
-                            <select id="contoDestinazione" name="contoDestinazione" class="form-select">
-                                <option value="">Seleziona destinazione...</option>
-                            </select>
-                        </div>
-
-                        <!-- Category -->
-                        <div class="form-group" id="categoriaGroup">
-                            <label class="form-label" for="categoria">Categoria</label>
-                            <select id="categoria" name="categoria" class="form-select" required>
-                                <option value="">📡 Caricamento...</option>
-                            </select>
-                        </div>
-
-                        <!-- Subcategory -->
-                        <div class="form-group" id="sottocategoriaGroup">
-                            <label class="form-label" for="sottocategoria">Sottocategoria</label>
-                            <select id="sottocategoria" name="sottocategoria" class="form-select">
-                                <option value="">Prima seleziona la categoria</option>
-                            </select>
-                        </div>
-
-                        <!-- Description -->
-                        <div class="form-group autocomplete-container">
-                            <label class="form-label" for="descrizione">Descrizione</label>
-                            <input type="text" 
-                                   id="descrizione" 
-                                   name="descrizione" 
-                                   class="form-input"
-                                   placeholder="Inizia a scrivere..."
-                                   autocomplete="off">
-                            <div id="descrizioneSuggestions" class="autocomplete-suggestions"></div>
-                        </div>
-
-                        <!-- Tags -->
-                        <div class="form-group">
-                            <label class="form-label">Etichette</label>
-                            <div class="tags-container">
-                                <div class="tags-display" id="tagsDisplay">
-                                    <input type="text" 
-                                           class="tags-input" 
-                                           id="tagsInput" 
-                                           placeholder="Aggiungi etichetta e premi Invio">
-                                </div>
-                                <input type="hidden" id="etichetta" name="etichetta">
-                            </div>
-                        </div>
-
-                        <!-- Date -->
-                        <div class="form-group">
-                            <label class="form-label" for="data">Data</label>
-                            <input type="date" id="data" name="data" class="form-input" required>
-                        </div>
-
-                    </form>
-
-                    <div id="message" class="message hidden"></div>
-                </div>
+                        <!-- Bottone Submit Originale (nascosto da CSS, ma utile per JS e fallback) -->
+                        <button type="submit" id="submitBtn" class="btn btn--submit btn--expense">
+                            <span id="submitText">Salva Transazione</span>
+                            <span id="submitSpinner" class="spinner hidden"></span>
+                        </button>
+                </form>
+                <div id="message" class="message hidden"></div>
             </section>
 
             <!-- Shared Page -->
@@ -271,31 +279,63 @@
             <!-- Settings Page -->
             <section id="settingsPage" class="page">
                 <div class="settings-grid">
-                    <!-- Analytics Dashboard -->
+                    <!-- User Personalization -->
                     <div class="card">
-                        <div class="card-title">📊 Dashboard Analytics</div>
+                        <div class="card-title">👤 Personalizzazione</div>
                         <div class="settings-item">
-                            <div class="settings-description">
-                                <div class="settings-label">Dashboard Completa</div>
-                                <div class="settings-sublabel">Grafici avanzati e analisi dettagliate</div>
+                            <div class="settings-description" style="flex-grow: 1;">
+                                <label for="userNameInput" class="settings-label" style="margin-bottom: var(--space-sm);">Il tuo nome</label>
+                                <input type="text" id="userNameInput" class="form-input" placeholder="Come ti chiami?" style="margin-bottom: var(--space-md);">
                             </div>
-                            <button class="btn btn--primary" onclick="openLookerStudio()">
-                                🚀 Apri Looker Studio
-                            </button>
+                            <!-- Il pulsante Salva è stato spostato più in basso -->
                         </div>
-                    </div>
 
-                    <!-- Google Sheet -->
-                    <div class="card">
-                        <div class="card-title">📋 Gestione Dati</div>
                         <div class="settings-item">
-                            <div class="settings-description">
-                                <div class="settings-label">Google Sheet</div>
-                                <div class="settings-sublabel">Accesso diretto ai dati</div>
+                            <div class="settings-description" style="flex-grow: 1;">
+                                <label for="defaultBalanceVisibilityToggle" class="settings-label">Mostra saldi all'avvio</label>
+                                <span class="settings-sublabel">Decidi se i saldi sono visibili o nascosti quando apri l'app.</span>
                             </div>
-                            <button class="btn btn--primary" onclick="openGoogleSheet()">
-                                📊 Apri Spreadsheet
-                            </button>
+                            <label class="switch" style="align-self: center;"> <!-- Semplice toggle switch CSS -->
+                                <input type="checkbox" id="defaultBalanceVisibilityToggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="settings-item">
+                            <div class="settings-description" style="flex-grow: 1;">
+                                <label for="defaultHomepageSelect" class="settings-label">Pagina iniziale predefinita</label>
+                                <span class="settings-sublabel">Scegli quale pagina visualizzare all'avvio.</span>
+                            </div>
+                            <select id="defaultHomepageSelect" class="form-select" style="max-width: 180px; align-self: center;">
+                                <option value="dashboard">Dashboard</option>
+                                <option value="transaction">Transazioni</option>
+                                <option value="addTransaction">Aggiungi</option>
+                            </select>
+                        </div>
+                        <button class="btn btn--primary" id="saveUserPreferencesBtn" style="width: 100%; margin-top: var(--space-lg);">Salva Preferenze</button>
+                        <div id="userPreferencesMessage" class="message hidden" style="margin-top: var(--space-md);"></div>
+                    </div>
+                    <!-- Configurazione Backend -->
+                    <div class="card"> <!-- Modificato per usare .card -->
+                        <div class="card-title">⚙️ Configurazione Backend</div> <!-- Modificato per coerenza -->
+                        <p class="settings-description">
+                            Modifica gli URL per connettere l'app al tuo Google Sheet e Apps Script.
+                        </p>
+                        <div style="padding: 0 var(--space-md) var(--space-md) var(--space-md);"> <!-- Aggiunto padding se necessario dentro la card -->
+                            <div class="form-group">
+                                <label for="appsScriptUrlInput">URL Google Apps Script:</label>
+                                <input type="url" id="appsScriptUrlInput" name="appsScriptUrlInput" class="form-input" placeholder="https://script.google.com/macros/s/...">
+                            </div>
+                            <div class="form-group">
+                                <label for="sheetIdInput">ID Google Sheet:</label>
+                                <input type="text" id="sheetIdInput" name="sheetIdInput" class="form-input" placeholder="ID del tuo foglio Google">
+                            </div>
+                            <div class="form-group">
+                                <label for="lookerUrlInput">URL Looker Studio (Opzionale):</label>
+                                <input type="url" id="lookerUrlInput" name="lookerUrlInput" class="form-input" placeholder="URL della tua dashboard Looker Studio">
+                            </div>
+                            <button id="saveBackendConfigBtn" class="btn btn--primary" style="width: 100%;">Salva Configurazione Backend</button>
+                            <div id="backendConfigMessage" class="message hidden" style="margin-top: var(--space-md);"></div>
                         </div>
                     </div>
 
@@ -323,7 +363,7 @@
 
         <!-- Bottom Navigation -->
         <nav class="bottom-nav">
-            <button class="nav-item" data-page="dashboard">
+            <button class="nav-item active" data-page="dashboard">
                 <span class="nav-icon">📊</span>
                 <span class="nav-label">Dashboard</span>
             </button>
@@ -331,7 +371,7 @@
                 <span class="nav-icon">💰</span>
                 <span class="nav-label">Transazioni</span>
             </button>
-            <button class="nav-item nav-item--add active" data-page="addTransaction">
+            <button class="nav-item nav-item--add" data-page="addTransaction">
                 <span class="nav-icon nav-icon--add">+</span>
                 <span class="nav-label">Aggiungi</span>
             </button>
