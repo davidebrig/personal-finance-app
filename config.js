@@ -5,7 +5,7 @@
 // Default Configuration
 const CONFIG = {
     // URL del Google Apps Script
-    DEFAULT_GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzTD5OUOhZY1cysHQlx9jFilS5i6z-OGzr8FJKbq8VzRC17vMkVoQzqJfcw8dGZHR0_/exec',
+    DEFAULT_GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzalmecL4CyRQguIKV1ng9-ZYCOxgrpQSd4Sex57LI7Zcf3iKOmjAwP0bTM4eafgK0/exec',
     
     // ID del Google Sheet (per aprire il link diretto)
     DEFAULT_GOOGLE_SHEET_ID: '1HbC77mPPxFm378OnJXqnoyRrEGzIp1WBooth37sZWXU',
@@ -67,28 +67,28 @@ const DESCRIPTION_SUGGESTIONS = [
 // Configurazione pagine (semplificata)
 const PAGES = {
     dashboard: {
-        title: '📊 Dashboard',
-        icon: '📊',
+        title: 'Dashboard',
+        icon: '',
         label: 'Dashboard'
     },
     transaction: {
-        title: '💰 Transazioni',
-        icon: '💰', 
+        title: 'Transazioni',
+        icon: '',
         label: 'Transazioni'
     },
     addTransaction: {
-        title: '💸 Aggiungi Transazione',
-        icon: '💸',
+        title: 'Nuovo record',
+        icon: '',
         label: 'Aggiungi'
     },
     shared: {
-        title: '👥 Condivise',
-        icon: '👥',
+        title: 'Condivise',
+        icon: '',
         label: 'Condivise'
     },
     settings: {
-        title: '⚙️ Impostazioni', 
-        icon: '⚙️',
+        title: 'Impostazioni',
+        icon: '',
         label: 'Impostazioni'
     }
 };
