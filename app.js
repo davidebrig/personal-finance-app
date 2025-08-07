@@ -61,6 +61,8 @@ function hideGlobalLoading() {
     if (loader) loader.style.display = 'none';
 }
 
+//
+
 // Global State Management & Balance Visibility
 const AppState = {
     currentPage: 'dashboard', // Imposta 'dashboard' come pagina di default
@@ -398,14 +400,32 @@ function updatePageTitle(page) {
     const closeEditBtn = document.getElementById('closeEditBtn');
     if (titleEl) {
         if (page === 'addTransaction' && AppState.editingTransactionId) {
-            titleEl.textContent = 'Modifica';
+            titleEl.innerHTML = `<span style="display: flex; align-items: center; gap: 10px;"><svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='12' y1='5' x2='12' y2='19'/><line x1='5' y1='12' x2='19' y2='12'/></svg> Modifica</span>`;
             if (closeEditBtn) closeEditBtn.classList.remove('hidden');
         } else if (pageConfig) {
-            titleEl.textContent = pageConfig.title;
+            let iconSVG = '';
+            switch(page) {
+                case 'dashboard':
+                    iconSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='12' width='4' height='8'/><rect x='9' y='8' width='4' height='12'/><rect x='15' y='4' width='4' height='16'/></svg>`;
+                    pageConfig.title = 'Personal Finance App';
+                    break;
+                case 'transaction':
+                    iconSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 8v8m0 0l-4-4m4 4l4-4'/></svg>`;
+                    break;
+                case 'addTransaction':
+                    iconSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='12' y1='5' x2='12' y2='19'/><line x1='5' y1='12' x2='19' y2='12'/></svg>`;
+                    break;
+                case 'shared':
+                    iconSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2'/><circle cx='9' cy='7' r='4'/><path d='M23 21v-2a4 4 0 0 0-3-3.87'/><path d='M16 3.13a4 4 0 0 1 0 7.75'/></svg>`;
+                    break;
+                case 'settings':
+                    iconSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='3'/><path d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 5 15.4a1.65 1.65 0 0 0-1.51-1V13a2 2 0 0 1 0-4v-.09A1.65 1.65 0 0 0 4.6 8a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09c.38.07.73.24 1 .51a1.65 1.65 0 0 0 1.82.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 8c.07.38.24.73.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-.51 1z'/></svg>`;
+                    break;
+            }
+            titleEl.innerHTML = `<span style="display: flex; align-items: center; gap: 10px;">${iconSVG} ${pageConfig.title}</span>`;
             if (closeEditBtn) closeEditBtn.classList.add('hidden');
         } else if (AppState.currentPage === 'addTransaction' && page === 'addTransaction') {
-            // Assicura che il titolo sia corretto all'avvio se la pagina di default è addTransaction
-            titleEl.textContent = PAGES.addTransaction.title;
+            titleEl.innerHTML = `<span style="display: flex; align-items: center; gap: 10px;"><svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='12' y1='5' x2='12' y2='19'/><line x1='5' y1='12' x2='19' y2='12'/></svg> Nuovo record</span>`;
             if (closeEditBtn) closeEditBtn.classList.add('hidden');
         }
     }
@@ -657,10 +677,11 @@ function displayTransactionsList(transactions) {
         return;
     }
     
-    // Prendi le ultime transazioni (limita a CONFIG.TRANSACTIONS.LIST_LIMIT)
+    // Ordina le transazioni per data decrescente (più recenti prima)
     const recentTransactions = transactions
-        .slice(-CONFIG.TRANSACTIONS.LIST_LIMIT)
-        .reverse(); // Più recenti prima
+        .slice() // copia per non mutare l'originale
+        .sort((a, b) => new Date(b.Data) - new Date(a.Data))
+        .slice(0, CONFIG.TRANSACTIONS.LIST_LIMIT);
     
     let transactionsHTML = '';
     
