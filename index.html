@@ -41,21 +41,29 @@
 <body>
     <!-- Header -->
         <header class="app-header">
-            <div class="header-center" id="headerCenter">
-                <button id="toggleBalanceVisibility" class="balance-toggle-btn" aria-label="Mostra saldi">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                </button>
-                <button id="closeEditBtn" class="balance-toggle-btn hidden" aria-label="Chiudi modifica" style="margin-left: 8px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-                <h1 id="pageTitle" class="header-title">📊 Dashboard</h1>
-            </div>
-            <div class="connection-status" id="connectionStatus">
-                <span class="status-dot loading"></span>
-                <span class="status-text">Connessione...</span>
+            <div class="header-center" id="headerCenter" style="display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%;">
+                <h1 id="pageTitle" class="header-title" style="display: flex; align-items: center; gap: 8px; font-size: 1.125rem; font-weight: 600; margin: 0;">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="8"/><rect x="9" y="8" width="4" height="12"/><rect x="15" y="4" width="4" height="16"/></svg>
+                  <span id="pageTitleText">Personal Finance App</span>
+                </h1>
+                <div class="header-actions" style="display: flex; align-items: center; gap: 12px; margin-left: auto;">
+                    <button id="toggleBalanceVisibility" class="balance-toggle-btn" aria-label="Mostra saldi">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
+                    <button id="closeEditBtn" class="balance-toggle-btn hidden" aria-label="Chiudi modifica" style="margin-left: 8px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div class="connection-status" id="connectionStatus" style="display: flex; align-items: center; gap: 10px;">
+                        <span class="status-dot loading"></span>
+                        <span class="status-text">Connessione...</span>
+                    </div>
+                    <div class="profile-avatar" style="width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: #eee; display: flex; align-items: center; justify-content: center;">
+                      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profilo" style="width: 100%; height: 100%; object-fit: cover;" />
+                    </div>
+                </div>
             </div>
         </header>
     <div class="app-container">
@@ -74,7 +82,9 @@
                     <!-- Quick Stats -->
                     <div class="stats-grid">
                         <div class="stat-card stat-card--income">
-                            <div class="stat-icon">📈</div>
+                            <div class="stat-icon"> <!-- 📈 -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/></svg>
+</div>
                             <div class="stat-content">
                             <div class="stat-value balance-value" id="monthlyIncome">€ 0</div>
                                 <div class="stat-label">Entrate mese</div>
@@ -82,7 +92,9 @@
                             </div>
                         </div>
                         <div class="stat-card stat-card--expense">
-                            <div class="stat-icon">📉</div>
+                            <div class="stat-icon"> <!-- 📉 -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 7 9 13 13 9 21 17"/></svg>
+</div>
                             <div class="stat-content">
                             <div class="stat-value balance-value" id="monthlyExpenses">€ 0</div>
                                 <div class="stat-label">Uscite mese</div>
@@ -94,7 +106,9 @@
                     <!-- Saving Rate Card -->
                     <div class="saving-rate-card">
                         <div class="saving-rate-content">
-                            <div class="saving-rate-icon">🎯</div>
+                            <div class="saving-rate-icon"> <!-- 🎯 -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+</div>
                             <div class="saving-rate-info">
                             <div class="saving-rate-value balance-value" id="savingRate">0%</div>
                                 <div class="saving-rate-label">Saving Rate</div>
@@ -108,7 +122,10 @@
 
                     <!-- Analytics Card -->
                     <div class="analytics-card">
-                        <div class="card-title">📊 Analytics Avanzate</div>
+                        <div class="card-title"> <!-- 📊 Analytics Avanzate -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="8"/><rect x="9" y="8" width="4" height="12"/><rect x="15" y="4" width="4" height="16"/></svg>
+  Analytics Avanzate
+</div>
                         <div class="analytics-content analytics-content-row">
                             <p class="analytics-subtitle">Visualizza report dettagliati e grafici avanzati</p>
                             <button class="btn btn--analytics" onclick="openLookerStudio()">
@@ -119,7 +136,10 @@
 
                     <!-- Accounts List -->
                     <div class="card">
-                        <div class="card-title">🏦 I tuoi conti</div>
+                        <div class="card-title"> <!-- 🏦 I tuoi conti -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="18" height="10"/><polygon points="12,3 2,10 22,10"/></svg>
+  I tuoi conti
+</div>
                         <div class="accounts-list" id="accountsList">
                             <div class="skeleton skeleton--text"></div>
                             <div class="skeleton skeleton--text"></div>
@@ -129,12 +149,10 @@
 
                     <!-- Recent Transactions -->
                     <div class="card">
-                        <div class="card-title">
-                            🕒 Transazioni recenti
-                            <button class="btn btn--small" onclick="changePage('transaction')">
-                                Vedi tutte
-                            </button>
-                        </div>
+                        <div class="card-title"> <!-- 🕒 Transazioni recenti -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+  Transazioni recenti
+</div>
                         <div id="recentTransactions">
                             <div class="skeleton skeleton--text"></div>
                             <div class="skeleton skeleton--text"></div>
@@ -148,9 +166,18 @@
             <section id="transactionPage" class="page">
                 <!-- Il titolo della card ora è un titolo di sezione diretto -->
                 <div class="card-title section-title">
-                    Ultime Transazioni
+                    <!-- HEADER TRANSAZIONI -->
+                    <h1 class="header-title" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 1.125rem; font-weight: 600; margin: 0 0 12px 0;">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v8m0 0l-4-4m4 4l4-4"/></svg>
+                      <span>Transazioni</span>
+                    </h1>
                     <button class="btn btn--primary" onclick="changePage('addTransaction')">
-                        <span>+</span> Nuova
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        <!-- HEADER NUOVO RECORD -->
+                        <h1 class="header-title" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 1.125rem; font-weight: 600; margin: 0 0 12px 0;">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                          <span>Nuovo record</span>
+                        </h1>
                     </button>
                 </div>
                 <div class="transactions-list" id="transactionsList">
@@ -166,14 +193,20 @@
                     <!-- Transaction Type -->
                     <div class="form-group">
                         <div class="tipo-buttons">
+                                <!-- Tipo transazione: Spesa -->
                                 <button type="button" class="tipo-btn tipo-btn--expense active" data-tipo="spesa">
-                                    📤 Spesa
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                                    Spesa
                                 </button>
+                                <!-- Tipo transazione: Entrata -->
                                 <button type="button" class="tipo-btn tipo-btn--income" data-tipo="entrata">
-                                    📥 Entrata
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+                                    Entrata
                                 </button>
+                                <!-- Tipo transazione: Trasferimento -->
                                 <button type="button" class="tipo-btn tipo-btn--transfer" data-tipo="trasferimento">
-                                    🔄 Trasferimento
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.13-3.36L23 10M1 14l5.36 5.36A9 9 0 0020.49 15"/></svg>
+                                    Trasferimento
                                 </button>
                         </div>
                         <input type="hidden" id="tipo" name="tipo" value="spesa">
@@ -195,7 +228,8 @@
                     <div class="form-group">
                         <label class="form-label" for="conto">Conto</label>
                         <select id="conto" name="conto" class="form-select" required>
-                            <option value="">📡 Caricamento...</option>
+                            <!-- Placeholder caricamento -->
+                            <option value=""><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="7"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.22 3.22l1.42 1.42M11.36 11.36l1.42 1.42M3.22 12.78l1.42-1.42M11.36 4.64l1.42-1.42"/></svg> Caricamento...</option>
                         </select>
                     </div>
 
@@ -211,7 +245,8 @@
                     <div class="form-group" id="categoriaGroup">
                         <label class="form-label" for="categoria">Categoria</label>
                         <select id="categoria" name="categoria" class="form-select" required>
-                            <option value="">📡 Caricamento...</option>
+                            <!-- Placeholder caricamento categoria -->
+                            <option value=""><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="7"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.22 3.22l1.42 1.42M11.36 11.36l1.42 1.42M3.22 12.78l1.42-1.42M11.36 4.64l1.42-1.42"/></svg> Caricamento...</option>
                         </select>
                     </div>
 
@@ -269,7 +304,10 @@
             <!-- Shared Page -->
             <section id="sharedPage" class="page">
                 <div class="card">
-                    <div class="card-title">👥 Transazioni Condivise</div>
+                    <div class="card-title"> <!-- 👥 Transazioni Condivise -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  Transazioni Condivise
+</div>
                     <div style="text-align: center; padding: 60px 20px; color: #666;">
                         <div style="font-size: 48px; margin-bottom: 16px;">🚧</div>
                         <div style="font-weight: 500; margin-bottom: 8px;">Sezione in costruzione</div>
@@ -285,7 +323,10 @@
                 <div class="settings-grid">
                     <!-- User Personalization -->
                     <div class="card">
-                        <div class="card-title">👤 Personalizzazione</div>
+                        <div class="card-title"> <!-- 👤 Personalizzazione -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21h13a2 2 0 0 0 2-2v-2a7 7 0 0 0-7-7h-2a7 7 0 0 0-7 7v2a2 2 0 0 0 2 2z"/></svg>
+  Personalizzazione
+</div>
                         <div class="settings-item">
                             <div class="settings-description" style="flex-grow: 1;">
                                 <label for="userNameInput" class="settings-label" style="margin-bottom: var(--space-sm);">Il tuo nome</label>
@@ -321,7 +362,10 @@
                     </div>
                     <!-- Configurazione Backend -->
                     <div class="card"> <!-- Modificato per usare .card -->
-                        <div class="card-title">⚙️ Configurazione Backend</div> <!-- Modificato per coerenza -->
+                        <div class="card-title"> <!-- ⚙️ Configurazione Backend -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 5 15.4a1.65 1.65 0 0 0-1.51-1V13a2 2 0 0 1 0-4v-.09A1.65 1.65 0 0 0 4.6 8a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09c.38.07.73.24 1 .51a1.65 1.65 0 0 0 1.82.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 8c.07.38.24.73.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-.51 1z"/></svg>
+  Configurazione Backend
+</div>
                         <p class="settings-description">
                             Modifica gli URL per connettere l'app al tuo Google Sheet e Apps Script.
                         </p>
@@ -345,7 +389,10 @@
 
                     <!-- App Info -->
                     <div class="card">
-                        <div class="card-title">ℹ️ Informazioni App</div>
+                        <div class="card-title"> <!-- ℹ️ Informazioni App -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="8"/></svg>
+  Informazioni App
+</div>
                         <div class="info-grid">
                             <div class="info-item">
                                 <span class="info-label">Versione</span>
@@ -357,7 +404,10 @@
                             </div>
                             <div class="info-item">
                                 <span class="info-label">Stato</span>
-                                <span class="info-value" id="appStatus">🟢 Operativo</span>
+                                <span class="info-value" id="appStatus"> <!-- 🟢 -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" stroke="#34C759" fill="#34C759"/></svg>
+  Operativo
+</span>
                             </div>
                         </div>
                     </div>
@@ -368,23 +418,23 @@
         <!-- Bottom Navigation -->
         <nav class="bottom-nav">
             <button class="nav-item active" data-page="dashboard">
-                <span class="nav-icon">📊</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="8"/><rect x="9" y="8" width="4" height="12"/><rect x="15" y="4" width="4" height="16"/></svg>
                 <span class="nav-label">Dashboard</span>
             </button>
             <button class="nav-item" data-page="transaction">
-                <span class="nav-icon">💰</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v8m0 0l-4-4m4 4l4-4"/></svg>
                 <span class="nav-label">Transazioni</span>
             </button>
             <button class="nav-item nav-item--add" data-page="addTransaction">
-                <span class="nav-icon nav-icon--add">+</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon nav-icon--add" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 <span class="nav-label">Aggiungi</span>
             </button>
             <button class="nav-item" data-page="shared">
-                <span class="nav-icon">👥</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 <span class="nav-label">Condivise</span>
             </button>
             <button class="nav-item" data-page="settings">
-                <span class="nav-icon">⚙️</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 5 15.4a1.65 1.65 0 0 0-1.51-1V13a2 2 0 0 1 0-4v-.09A1.65 1.65 0 0 0 4.6 8a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09c.38.07.73.24 1 .51a1.65 1.65 0 0 0 1.82.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 8c.07.38.24.73.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-.51 1z"/></svg>
                 <span class="nav-label">Impostazioni</span>
             </button>
         </nav>
