@@ -2,43 +2,51 @@
    FINANCE APP - RESPONSIVE STYLES COMPLETE
    =============================================== */
 
-/* CSS CUSTOM PROPERTIES (CSS VARIABLES) */
+/* CSS CUSTOM PROPERTIES (CSS VARIABLES) - APPLE INSPIRED */
 :root {
-  /* Colors */
-  --color-primary: #3b82f6; /* Blue accent for primary actions */
-  --color-primary-light: #60a5fa; /* Lighter blue for hover states */
-  --color-secondary: #9E9E9E; /* Medium Gray */
-  --color-tertiary: #757575; /* Darker Medium Gray */
-  --color-background: #121212; /* Very dark gray */
-  --color-surface: #1E1E1E; /* Dark gray for card surfaces, modals, etc. */
-  --color-border: #333333; /* Dark gray for borders */
-  --color-border-light: #444444; /* Slightly lighter dark gray for subtle borders */
-  --color-text: #E0E0E0; /* Light gray for main text */
-  --color-text-light: #B0B0B0; /* Slightly darker light gray for secondary text */
-  --color-text-muted: #888888; /* Medium gray for muted text */
+  /* Apple-inspired Color Palette */
+  --color-primary: #007AFF; /* Apple Blue */
+  --color-primary-light: #5AC8FA; /* Light Apple Blue */
+  --color-primary-dark: #0056CC; /* Dark Apple Blue */
   
-  /* Status Colors */
-  --color-success: #10b981;
-  --color-success-light: rgba(16, 185, 129, 0.15); /* Dark, semi-transparent bg for success elements */
-  --color-error: #ef4444;
-  --color-error-light: rgba(239, 68, 68, 0.15); /* Dark, semi-transparent bg for error elements */
-  --color-warning: #f59e0b;
-  --color-warning-light: rgba(245, 158, 11, 0.15); /* Dark, semi-transparent bg for warning elements */
-  --color-info: #3b82f6;
-  --color-info-light: rgba(59, 130, 246, 0.15); /* Dark, semi-transparent bg for info elements */
+  /* System Colors */
+  --color-success: #34C759; /* Apple Green */
+  --color-error: #FF3B30; /* Apple Red */
+  --color-warning: #FF9500; /* Apple Orange */
+  
+  /* Background Colors */
+  --color-background: #F9F9F9; /* Light gray */
+  --color-surface: #FFFFFF; /* White */
+  --color-surface-light: #2C2C2E; /* System Gray 5 */
+  --color-surface-secondary: #3A3A3C; /* System Gray 4 */
+  
+  /* Border Colors */
+  --color-border: #E5E5EA; /* Light gray */
+  --color-border-light: #48484A; /* System Gray 2 */
+  
+  /* Text Colors */
+  --color-text: #1C1C1E; /* Dark gray */
+  --color-text-secondary: #8E8E93; /* System Gray */
+  --color-text-tertiary: #C7C7CC; /* System Gray 2 */
+  --color-text-quaternary: #D1D1D6; /* System Gray 3 */
+  
+  /* Gradients - Apple Style */
+  --gradient-primary: linear-gradient(135deg, #007AFF 0%, #5AC8FA 100%);
+  --gradient-surface: linear-gradient(135deg, #1C1C1E 0%, #2C2C2E 100%);
+  --gradient-card: linear-gradient(135deg, rgba(28, 28, 30, 0.95) 0%, rgba(44, 44, 46, 0.9) 100%);
   
   /* Spacing */
   --space-xs: 4px;
   --space-sm: 8px;
-  --space-md: 12px;
-  --space-lg: 16px;
-  --space-xl: 20px;
-  --space-2xl: 24px;
+  --space-md: 16px;
+  --space-lg: 20px;
+  --space-xl: 28px;
+  --space-2xl: 40px;
   --space-3xl: 32px;
   --space-4xl: 40px;
   
-  /* Typography */
-  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Typography - Apple Style */
+  --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
   --font-size-xs: 11px;
   --font-size-sm: 13px;
   --font-size-base: 15px;
@@ -55,25 +63,26 @@
   --font-weight-bold: 700;
   
   --line-height-tight: 1.2;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.7;
+  --line-height-normal: 1.35;
+  --line-height-relaxed: 1.5;
   
   /* Border Radius */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 24px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
   --radius-full: 9999px;
   
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.15); /* Adjusted for dark theme */
-  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.2);  /* Adjusted for dark theme */
-  --shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.25); /* Adjusted for dark theme */
-  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.3);  /* Adjusted for dark theme */
+  /* Shadows - Apple Style */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.25);
+  --shadow-glow: 0 0 16px rgba(0, 122, 255, 0.15);
   
   /* Transitions */
-  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 0.12s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   
@@ -110,7 +119,8 @@ html {
 
 body {
   font-family: var(--font-family);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
   line-height: var(--line-height-normal);
   color: var(--color-text);
   background-color: var(--color-background);
@@ -135,7 +145,7 @@ body {
   position: relative;
 }
 
-/* HEADER */
+/* HEADER - Apple Style */
 .app-header {
   position: sticky;
   top: 0;
@@ -145,13 +155,15 @@ body {
   padding-top: calc(var(--space-md) + var(--safe-area-inset-top));
   display: flex;
   justify-content: space-between;
-  /* Modificato per accomodare il toggle button a sinistra */
   align-items: center;
   gap: var(--space-lg);
   min-height: var(--header-height);
-  background: rgba(30, 30, 30, 0.9); /* Darker translucent background */
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .balance-toggle-btn {
@@ -181,19 +193,33 @@ body {
     background-color: rgba(255, 255, 255, 0.1); /* Feedback al click */
 }
 
-.header-title {
-  font-size: var(--font-size-2xl);
+.header-title, h1 {
+  font-size: var(--font-size-title1);
   font-weight: var(--font-weight-semibold);
-  margin: 0;
-  flex-shrink: 0;
-  flex-grow: 1; /* Permette al titolo di occupare lo spazio rimanente */
-  text-align: center; /* Centra il titolo */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-left: auto; /* Aiuta a centrare se il connection-status è presente */
-  margin-right: auto; /* Aiuta a centrare se il connection-status è presente */
+  line-height: var(--line-height-tight);
+  margin: 0 0 var(--space-lg) 0;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+  text-align: center;
 }
+
+h2, .card-title {
+  font-size: var(--font-size-title1);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  margin: 0 0 var(--space-md) 0;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: var(--font-size-title2);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  margin: 0 0 var(--space-sm) 0;
+  color: var(--color-text-secondary);
+}
+
 .balance-toggle-btn svg {
     width: 20px; /* Dimensione effettiva dell'icona */
     height: 20px; /* Dimensione effettiva dell'icona */
@@ -331,24 +357,40 @@ body {
   display: none; /* Nascosto di default, mostrato da JS */
 }
 
-/* CARD COMPONENT */
-.card {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
+/* CARD COMPONENT - Apple Style */
+.card, .stat-card, .balance-card, .saving-rate-card, .analytics-card {
+  background: var(--color-surface);
   border-radius: var(--radius-lg);
-  padding: var(--space-xl);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--color-border);
+  padding: var(--space-lg) var(--space-lg) var(--space-md) var(--space-lg);
   margin-bottom: var(--space-lg);
-  transition: var(--transition-normal);
-  box-shadow: var(--shadow-sm);
 }
 
-.card:hover {
-  border-color: var(--color-border-light);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+.card::before, .stat-card::before, .balance-card::before, .saving-rate-card::before, .analytics-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  pointer-events: none;
 }
 
-.card-title {
+.card:hover, .stat-card:hover, .balance-card:hover, .saving-rate-card:hover, .analytics-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.card:hover::before, .stat-card:hover::before, .balance-card:hover::before, .saving-rate-card:hover::before, .analytics-card:hover::before {
+  opacity: 1;
+}
+
+.card-title, .stat-card--income, .stat-card--expense, .analytics-card .card-title {
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   margin-bottom: var(--space-lg);
@@ -372,18 +414,18 @@ body {
   width: 100%;
 }
 
-/* BALANCE CARD */
+/* BALANCE CARD - Apple Style */
 .balance-card {
-  background: linear-gradient(135deg, #2A2A2A 0%, #1A1A1A 100%); /* Adjusted dark gradient */
-  color: var(--color-text); /* Use theme text color */
-  border: none;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   padding: var(--space-3xl);
   text-align: center;
   margin-bottom: var(--space-lg);
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .balance-card::before {
@@ -393,8 +435,14 @@ body {
   right: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%); /* More subtle for dark */
+  background: radial-gradient(circle, rgba(79, 70, 229, 0.1) 0%, transparent 70%);
   pointer-events: none;
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(180deg); }
 }
 
 .balance-amount {
@@ -421,18 +469,39 @@ body {
 
 .stat-card {
   border: 1px solid var(--color-border);
-  background: linear-gradient(135deg, var(--color-surface) 0%, #282828 100%); /* Dark gradient */
+  background: var(--color-surface);
   border-radius: var(--radius-lg);
   padding: var(--space-lg);
   display: flex;
   align-items: center;
   gap: var(--space-md);
-  transition: var(--transition-normal);
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  pointer-events: none;
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.stat-card:hover::before {
+  opacity: 1;
 }
 
 .stat-card--income {
@@ -468,6 +537,14 @@ body {
 
 .stat-card--expense .stat-value {
   color: var(--color-error);
+}
+
+.stat-label {
+  color: var(--color-text-tertiary);
+}
+
+.stat-change {
+  color: var(--color-text-quaternary);
 }
 
 .stat-label {
@@ -507,7 +584,7 @@ body {
 
 /* SAVING RATE CARD */
 .saving-rate-card {
-  background: linear-gradient(135deg, #2C2C2C 0%, #222222 100%); /* Dark gradient */
+  background: linear-gradient(135deg, var(--color-surface) 0%, rgba(59, 130, 246, 0.10) 100%); /* Delicato blu scuro */
   border: 1px solid rgba(187, 187, 187, 0.15); /* Lighter border color for dark theme */
   border-radius: var(--radius-lg);
   padding: var(--space-xl);
@@ -653,28 +730,42 @@ body {
   color: #ffffff;
 }
 
-/* BUTTON COMPONENT */
+/* BUTTON COMPONENT - Apple Style */
 .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-sm);
+  border-radius: var(--radius-lg);
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-body);
   padding: var(--space-md) var(--space-xl);
   border: none;
-  border-radius: var(--radius-xl);
-  font-size: var(--font-size-base);
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  text-decoration: none;
-  cursor: pointer;
-  transition: var(--transition-normal);
-  white-space: nowrap;
-  user-select: none;
-  outline: none;
-  min-height: 50px;
-  font-family: inherit;
-  position: relative;
-  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: background 0.15s, box-shadow 0.15s, transform 0.12s;
+}
+.btn:active {
+  background: #0056CC;
+  transform: scale(0.98);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  pointer-events: none;
+}
+
+.btn:hover::before {
+  opacity: 1;
 }
 
 .btn:disabled {
@@ -684,14 +775,21 @@ body {
 }
 
 .btn--primary {
-  background-color: var(--color-primary);
-  color: #ffffff; /* White text on primary color (blue) */
+  background: var(--color-primary);
+  color: #ffffff;
+  border: none;
+  box-shadow: var(--shadow-sm);
 }
 
 .btn--primary:hover:not(:disabled) {
-  background-color: var(--color-primary-light);
+  background: var(--color-primary-light);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
+}
+
+.btn--primary:active {
+  background: var(--color-primary-dark);
+  transform: translateY(0);
 }
 
 .btn--analytics {
@@ -791,16 +889,20 @@ body {
 
 .form-input,
 .form-select {
-  width: 100%;
-  padding: var(--space-md) var(--space-lg);
-  border: 1.5px solid #444444; /* Darker border */
   border-radius: var(--radius-md);
-  font-size: var(--font-size-lg);
-  background-color: #2B2B2B; /* Dark input background */
-  transition: all var(--transition-normal);
-  min-height: 48px;
-  font-family: inherit;
-  color: var(--color-text); /* Ensure text is light */
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-body);
+  padding: var(--space-md);
+  box-shadow: none;
+  transition: border 0.15s, box-shadow 0.15s;
+}
+
+.form-input::placeholder,
+.form-select::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.7;
 }
 
 .form-input:hover,
@@ -810,10 +912,9 @@ body {
 
 .form-input:focus,
 .form-select:focus {
+  border: 1.5px solid var(--color-primary);
   outline: none;
-  background-color: var(--color-surface); /* Use surface color for focus */
-  border-color: var(--color-primary); /* Primary color for focus border */
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); /* Primary color focus ring */
+  box-shadow: 0 0 0 2px rgba(0,122,255,0.08);
 }
 
 .form-input--amount {
@@ -1021,16 +1122,13 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-lg) 0;
-  border-bottom: 1px solid var(--color-border-light);
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
   transition: var(--transition-normal);
   position: relative;
-      /* Rimuoviamo il padding-left qui se le azioni sono all'interno e gestite da flex */
-    }
-    
-    .transaction-item {
-      /* Assicurati che transaction-item sia flex per allineare le azioni */
-  padding-left: var(--space-lg);
+  background: var(--color-surface);
+  margin-bottom: var(--space-sm);
+  border-radius: var(--radius-md);
 }
 
 .transaction-item::before {
@@ -1102,7 +1200,7 @@ body {
 }
 
 .transaction-amount.transfer {
-  color: var(--color-text);
+  color: var(--color-text-secondary);
 }
 
 .transaction-account {
@@ -1290,7 +1388,7 @@ body {
   font-weight: var(--font-weight-medium);
 }
 
-/* BOTTOM NAVIGATION - FIXED */
+/* BOTTOM NAVIGATION - Apple Style */
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -1298,64 +1396,42 @@ body {
   right: 0;
   width: 100%;
   height: var(--bottom-nav-total-height);
-  background: rgba(30, 30, 30, 0.9); /* Darker translucent background */
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-top: 1px solid var(--color-border); /* Use theme border color */
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-  z-index: 40;
-  
-  /* Grid layout per 5 elementi */
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -1px 8px rgba(0,0,0,0.04);
+  display: flex;
+  justify-content: space-around;
   align-items: center;
-  padding: var(--space-sm) var(--space-xs);
-  padding-bottom: calc(var(--space-sm) + var(--safe-area-inset-bottom));
+  height: 60px;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
-/* Nav items base */
+/* Nav items base - Apple Style */
 .nav-item {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-caption);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-decoration: none;
-  color: var(--color-text-light);
-  transition: var(--transition-normal);
-  cursor: pointer;
-  border: none;
-  background: none;
-  font-family: inherit;
-  min-height: 52px;
-  padding: var(--space-sm) var(--space-xs);
   border-radius: var(--radius-md);
-  position: relative;
-  width: 100%;
-}
-
-.nav-item::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 3px;
-  background-color: var(--color-primary);
-  border-radius: 2px;
-  transition: width var(--transition-normal);
-}
-
-.nav-item.active::after {
-  width: 24px;
+  padding: var(--space-xs) var(--space-md);
+  transition: color 0.15s, background 0.15s;
+  min-height: 44px;
 }
 
 .nav-item.active {
-  color: var(--color-text);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  background: none;
 }
 
 .nav-item:hover:not(.nav-item--add) {
-  background-color: rgba(255, 255, 255, 0.03); /* Subtle light hover */
+  color: var(--color-text-secondary);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 /* BOTTONE + PERFETTO */
@@ -1363,13 +1439,13 @@ body {
   /* Reset di tutti i valori che potrebbero interferire */
   all: unset;
   
-  /* Dimensioni fisse ridotte */
-  width: 40px !important;
-  height: 40px !important;
-  min-width: 40px !important;
-  max-width: 40px !important;
-  min-height: 40px !important;
-  max-height: 40px !important;
+  /* Dimensioni fisse */
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  max-width: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
   
   /* Centra nel grid */
   justify-self: center;
@@ -1377,14 +1453,14 @@ body {
   
   /* Stili visuali */
   background: var(--color-primary);
-  color: #ffffff; /* White icon on primary color (blue) */
+  color: #ffffff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); /* Adjusted shadow */
-  transition: var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
   
   /* Posizionamento */
   position: relative;
@@ -1398,32 +1474,32 @@ body {
 
 .nav-item--add:hover {
   background: var(--color-primary-light);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Adjusted shadow */
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .nav-item--add:active {
+  background: var(--color-primary-dark);
   transform: translateY(0);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25); /* Adjusted shadow */
+  box-shadow: var(--shadow-sm);
 }
 
 .nav-item--add::after {
   display: none;
 }
 
-/* Icone navigazione */
+/* Icone navigazione - Apple Style */
 .nav-icon {
   font-size: 22px;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   line-height: 1;
 }
 
 .nav-icon--add {
-  font-size: 28px;
-  font-weight: 300;
+  font-size: 24px;
+  font-weight: 400;
   line-height: 1;
   margin: 0;
-  /* Centra perfettamente il + */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1432,10 +1508,11 @@ body {
 }
 
 .nav-label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   line-height: 1.2;
-  margin-top: 2px;
+  margin-top: 1px;
+  letter-spacing: -0.01em;
 }
 
 .nav-item--add .nav-label {
@@ -1628,7 +1705,7 @@ body {
 /* Tablets */
 @media (min-width: 768px) {
   :root {
-    --max-width-mobile: var(--max-width-tablet);
+    --max-width-mobile: 100%;
     --space-lg: 20px;
     --space-xl: 24px;
     --space-2xl: 28px;
@@ -1638,7 +1715,7 @@ body {
   }
 
   .app-container {
-    max-width: var(--max-width-tablet);
+    max-width: 100%;
   }
 
   .dashboard-grid {
@@ -1708,19 +1785,20 @@ body {
 /* Desktop */
 @media (min-width: 1024px) {
   :root {
-    --max-width-mobile: var(--max-width-desktop);
+    --max-width-mobile: 100%;
     --header-height: 70px;
     --bottom-nav-height: 70px;
     --safe-area-inset-bottom: 0px;
   }
 
   .app-container {
-    max-width: var(--max-width-desktop);
+    max-width: 100%;
   }
 
   .dashboard-grid {
     grid-template-columns: 1fr 1fr;
-    max-width: 800px;
+    max-width: 1200px;
+    width: 100%;
     margin: 0 auto;
   }
 
@@ -1781,7 +1859,10 @@ body {
 
 /* Extra large screens */
 @media (min-width: 1440px) {
-  .bottom-nav,
+  .dashboard-grid {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 1400px;
+  }
   .sticky-submit {
     max-width: 700px;
   }
@@ -1915,4 +1996,565 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+/* ===============================================
+   FINANCE APP - ENHANCED ANIMATIONS & EFFECTS
+   =============================================== */
+
+/* Enhanced loading animations */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: var(--shadow-glow);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(79, 70, 229, 0.5);
+  }
+}
+
+/* Enhanced card animations */
+.card {
+  animation: slideInUp 0.4s ease-out;
+}
+
+.stat-card {
+  animation: fadeInScale 0.3s ease-out;
+}
+
+.balance-card {
+  animation: fadeInScale 0.4s ease-out;
+}
+
+/* Enhanced button interactions */
+.btn:active {
+  transform: scale(0.98);
+}
+
+.nav-item--add:active {
+  transform: scale(0.95);
+}
+
+/* Enhanced form focus states */
+.form-input:focus,
+.form-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+  transform: scale(1.02);
+}
+
+/* Enhanced transaction items */
+.transaction-item {
+  animation: slideInUp 0.3s ease-out;
+  transition: all var(--transition-normal);
+}
+
+.transaction-item:hover {
+  transform: translateX(4px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Enhanced saving rate indicator */
+.saving-rate-indicator {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Enhanced balance toggle */
+.balance-toggle-btn {
+  transition: all var(--transition-normal);
+}
+
+.balance-toggle-btn:hover {
+  transform: scale(1.1);
+  box-shadow: var(--shadow-glow);
+}
+
+/* Enhanced navigation items */
+.nav-item {
+  transition: all var(--transition-normal);
+}
+
+.nav-item:hover {
+  color: var(--color-text-light);
+  background-color: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+
+.nav-item.active {
+  color: var(--color-text);
+}
+
+/* Enhanced message animations */
+.message {
+  animation: slideInUp 0.4s ease-out;
+}
+
+/* Enhanced skeleton loading */
+.skeleton {
+  background: linear-gradient(90deg, 
+    var(--color-surface) 25%, 
+    var(--color-surface-light) 50%, 
+    var(--color-surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Enhanced autocomplete */
+.autocomplete-suggestion {
+  transition: all var(--transition-fast);
+}
+
+.autocomplete-suggestion:hover {
+  background: var(--gradient-card);
+  transform: translateX(4px);
+}
+
+/* Enhanced tags */
+.tag {
+  transition: all var(--transition-fast);
+}
+
+.tag:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Enhanced account items */
+.account-item {
+  transition: all var(--transition-normal);
+}
+
+.account-item:hover {
+  transform: translateX(4px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Enhanced settings items */
+.settings-item {
+  transition: all var(--transition-normal);
+}
+
+.settings-item:hover {
+  background: var(--gradient-card);
+  transform: translateX(4px);
+}
+
+/* Enhanced analytics card */
+.analytics-card {
+  animation: fadeInScale 0.6s ease-out;
+}
+
+.analytics-card:hover {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Enhanced welcome message */
+.welcome-message {
+  animation: slideInUp 0.8s ease-out;
+}
+
+/* Enhanced connection status */
+.connection-status {
+  transition: all var(--transition-normal);
+}
+
+.connection-status:hover {
+  transform: scale(1.05);
+}
+
+/* Enhanced sticky submit */
+.sticky-submit {
+  animation: slideInUp 0.4s ease-out;
+}
+
+/* Enhanced page transitions */
+.page {
+  animation: fadeInScale 0.3s ease-out;
+}
+
+/* Enhanced form groups */
+.form-group {
+  transition: all var(--transition-normal);
+}
+
+.form-group:focus-within {
+  transform: translateY(-2px);
+}
+
+/* Enhanced tipo buttons */
+.tipo-btn {
+  transition: all var(--transition-normal);
+}
+
+.tipo-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.tipo-btn.active {
+  animation: pulseGlow 1s ease-in-out infinite;
+}
+
+/* Enhanced balance amount */
+.balance-amount {
+  transition: all var(--transition-normal);
+}
+
+
+/* Enhanced stat values */
+.stat-value {
+  transition: all var(--transition-normal);
+}
+
+
+/* Enhanced saving rate value */
+.saving-rate-value {
+  transition: all var(--transition-normal);
+}
+
+
+/* Enhanced transaction amounts */
+.transaction-amount {
+  transition: all var(--transition-fast);
+}
+
+
+/* Enhanced account balances */
+.account-balance {
+  transition: all var(--transition-fast);
+}
+
+
+/* Enhanced info values */
+.info-value {
+  transition: all var(--transition-fast);
+}
+
+
+/* Enhanced switch */
+.switch {
+  transition: all var(--transition-normal);
+}
+
+.switch:hover {
+  transform: scale(1.05);
+}
+
+/* Enhanced spinner */
+.spinner {
+  animation: spin 1s linear infinite, pulseGlow 2s ease-in-out infinite;
+}
+
+/* Enhanced skeleton text */
+.skeleton--text {
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Enhanced skeleton amount */
+.skeleton--amount {
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Enhanced message success */
+.message.success {
+  animation: slideInUp 0.4s ease-out, pulseGlow 2s ease-in-out infinite;
+}
+
+/* Enhanced message error */
+.message.error {
+  animation: slideInUp 0.4s ease-out, pulseGlow 2s ease-in-out infinite;
+}
+
+/* Enhanced message loading */
+.message.loading {
+  animation: slideInUp 0.4s ease-out, pulseGlow 2s ease-in-out infinite;
+}
+
+/* Enhanced hidden elements */
+.hidden {
+  animation: fadeInScale 0.3s ease-out reverse;
+}
+
+/* Enhanced screen reader only */
+.sr-only {
+  animation: none;
+}
+
+/* Enhanced responsive animations */
+@media (max-width: 375px) {
+  .card {
+    animation: slideInUp 0.4s ease-out;
+  }
+  
+  .stat-card {
+    animation: fadeInScale 0.3s ease-out;
+  }
+  
+  .balance-card {
+    animation: fadeInScale 0.4s ease-out;
+  }
+}
+
+@media (min-width: 768px) {
+  .card {
+    animation: slideInUp 0.8s ease-out;
+  }
+  
+  .stat-card {
+    animation: fadeInScale 0.6s ease-out;
+  }
+  
+  .balance-card {
+    animation: fadeInScale 0.7s ease-out;
+  }
+}
+
+@media (min-width: 1024px) {
+  .card {
+    animation: slideInUp 1s ease-out;
+  }
+  
+  .stat-card {
+    animation: fadeInScale 0.8s ease-out;
+  }
+  
+  .balance-card {
+    animation: fadeInScale 0.9s ease-out;
+  }
+}
+
+/* Enhanced reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .skeleton {
+    animation: none;
+    background: var(--color-surface);
+  }
+  
+  .spinner {
+    animation: none;
+  }
+  
+  .card,
+  .stat-card,
+  .balance-card,
+  .transaction-item,
+  .welcome-message,
+  .analytics-card,
+  .message,
+  .sticky-submit,
+  .page {
+    animation: none;
+  }
+  
+  .btn:hover,
+  .nav-item:hover,
+  .nav-item--add:hover,
+  .form-input:hover,
+  .form-select:hover,
+  .tipo-btn:hover,
+  .tag:hover,
+  .account-item:hover,
+  .settings-item:hover,
+  .connection-status:hover,
+  .switch:hover,
+  .balance-amount:hover,
+  .stat-value:hover,
+  .saving-rate-value:hover,
+  .transaction-amount:hover,
+  .account-balance:hover,
+  .info-value:hover {
+    transform: none;
+  }
+}
+
+/* ===============================================
+   BOTTOM NAVIGATION OPTIMIZATIONS
+   =============================================== */
+
+/* Cleaner bottom nav background */
+.bottom-nav {
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -1px 8px rgba(0,0,0,0.04);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* Simplified nav items */
+.nav-item {
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
+  border-radius: var(--radius-sm);
+  min-height: 44px;
+}
+
+.nav-item:hover {
+  color: var(--color-text-light);
+  background: none;
+}
+
+.nav-item.active {
+  color: var(--color-text);
+}
+
+/* Cleaner active indicator */
+.nav-item::after {
+  height: 2px;
+  border-radius: 1px;
+  transition: width var(--transition-fast);
+}
+
+.nav-item.active::after {
+  width: 16px;
+}
+
+/* Simplified add button */
+.nav-item--add {
+  background: var(--color-primary);
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
+  transition: all var(--transition-fast);
+}
+
+.nav-item--add:hover {
+  background: var(--color-primary-light);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(79, 70, 229, 0.35);
+}
+
+.nav-item--add:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(79, 70, 229, 0.25);
+}
+
+/* Cleaner icons */
+.nav-icon {
+  font-size: 18px;
+  margin-bottom: 2px;
+}
+
+.nav-icon--add {
+  font-size: 22px;
+  font-weight: 500;
+}
+
+/* Cleaner labels */
+.nav-label {
+  font-size: 9px;
+  font-weight: 500;
+  margin-top: 1px;
+  opacity: 0.9;
+}
+
+/* Responsive optimizations */
+@media (max-width: 375px) {
+  .nav-icon {
+    font-size: 16px;
+  }
+  
+  .nav-icon--add {
+    font-size: 20px;
+  }
+  
+  .nav-label {
+    font-size: 8px;
+  }
+}
+
+@media (min-width: 768px) {
+  .nav-icon {
+    font-size: 20px;
+  }
+  
+  .nav-icon--add {
+    font-size: 24px;
+  }
+  
+  .nav-label {
+    font-size: 10px;
+  }
+}
+
+/* Touch optimizations */
+@media (pointer: coarse) {
+  .nav-item {
+    min-height: 48px;
+  }
+  
+  .nav-item--add {
+    min-height: 44px;
+  }
+}
+
+.card:hover, .stat-card:hover, .saving-rate-card:hover, .analytics-card:hover, .settings-item:hover, .account-item:hover, .tipo-btn:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  transform: translateY(-2px) scale(1.01);
+  background: var(--color-surface);
+  border-color: var(--color-primary);
+}
+
+.btn:hover, .nav-item:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  transform: translateY(-1px) scale(1.01);
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.btn:active, .nav-item:active {
+  background: #0056CC;
+  transform: scale(0.98);
+}
+
+/* Rimuovo gradienti e overlay hover */
+.card::before, .stat-card::before, .saving-rate-card::before, .analytics-card::before {
+  display: none !important;
+}
+
+/* Apple UI: nessun effetto hover su box/card */
+.card:hover, .stat-card:hover, .balance-card:hover, .saving-rate-card:hover, .analytics-card:hover,
+.account-item:hover, .settings-item:hover {
+  box-shadow: none !important;
+  transform: none !important;
+  background: inherit !important;
+  border-color: inherit !important;
+}
+.card:hover::before, .stat-card:hover::before, .balance-card:hover::before, .saving-rate-card:hover::before, .analytics-card:hover::before {
+  opacity: 0 !important;
 }
