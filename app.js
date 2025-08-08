@@ -72,6 +72,7 @@ const AppState = {
         categorie: [],
         transazioni: []
     },
+    cachedBudgets: null,
     editingTransactionId: null, // ID della transazione in modifica, o null
     userConfig: { // Per configurazioni backend
         googleAppsScriptUrl: '',
@@ -81,6 +82,15 @@ const AppState = {
         userName: '',
         defaultBalanceVisible: true,
         defaultHomepage: 'dashboard'
+    },
+    _loading: { // Flag caricamenti per evitare duplicazioni
+        monthlyStatsInFlight: false,
+        monthlyStatsLoaded: false,
+        transactionsInFlight: false,
+        transactionsLoaded: false,
+        initialDataLoaded: false,
+        budgetsInFlight: false,
+        budgetsLoaded: false
     },
     connectionStatus: APP_STATES.LOADING
 };
@@ -140,6 +150,83 @@ function initializeApp() {
     
     DEBUG.log('App completa inizializzata con successo');
     console.log('✅ App inizializzazione completata!');
+
+    // Revalidate su focus/visibilità
+    if (typeof document !== 'undefined') {
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                revalidateDashboardIfStale();
+            }
+        });
+    }
+    if (typeof window !== 'undefined') {
+        window.addEventListener('focus', () => {
+            revalidateDashboardIfStale();
+        });
+        window.addEventListener('online', () => {
+            revalidateDashboardIfStale();
+        });
+    }
+}
+
+// Timestamps per freshness
+const Freshness = {
+    initialData: 0,
+    dashboardStats: 0,
+    transactions: 0,
+    budgets: 0
+};
+
+// Auto-refresh timer per la dashboard
+let dashboardAutoRefreshTimer = null;
+
+function revalidateDashboardIfStale() {
+    if (AppState.currentPage !== 'dashboard') return;
+    if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+
+    const now = Date.now();
+    try {
+        // Stats KPI
+        if (!AppState._loading.monthlyStatsInFlight && (!Freshness.dashboardStats || now - Freshness.dashboardStats >= CONFIG.CACHE.TTL.DASHBOARD_STATS)) {
+            updateMonthlyStats();
+        }
+
+        // Dati base (conti) – usa TTL iniziale e logica interna di skip; se stale forza refetch silenzioso
+        if (!AppState._loading.initialDataLoaded) {
+            loadSpreadsheetData({ silent: true });
+        } else if (Freshness.initialData && now - Freshness.initialData >= CONFIG.CACHE.TTL.INITIAL_DATA) {
+            loadSpreadsheetData({ silent: true, force: true });
+        } else {
+            // Aggiorna conti/recents se già abbiamo dati
+            updateAccountBalances();
+            updateRecentTransactions();
+        }
+
+        // Transazioni recenti
+        if (!AppState._loading.transactionsInFlight && (!Freshness.transactions || now - Freshness.transactions >= CONFIG.CACHE.TTL.TRANSACTIONS)) {
+            loadTransactionsList({ force: true });
+        }
+    } catch (e) {
+        DEBUG.error('Errore revalidateDashboardIfStale', e);
+    }
+}
+
+function startDashboardAutoRefresh() {
+    stopDashboardAutoRefresh();
+    // Primo tentativo immediato (non bloccante, con guard)
+    revalidateDashboardIfStale();
+    const interval = CONFIG.DASHBOARD.AUTO_REFRESH_INTERVAL || 30000;
+    dashboardAutoRefreshTimer = setInterval(() => {
+        revalidateDashboardIfStale();
+    }, interval);
+}
+
+function stopDashboardAutoRefresh() {
+    if (dashboardAutoRefreshTimer) {
+        clearInterval(dashboardAutoRefreshTimer);
+        dashboardAutoRefreshTimer = null;
+    }
 }
 
 function initializeUserPreferences() {
@@ -403,7 +490,8 @@ function changePage(page, isInitialLoad = false) {
         // Se è il caricamento iniziale e la pagina è addTransaction, non serve ricaricare tutto subito
         // handlePageChange si occuperà di caricare i dati se necessario per altre pagine
         if (!isInitialLoad || page !== 'addTransaction') {
-            setTimeout(() => handlePageChange(page), 50); // Ridotto timeout
+            // Elimina ritardo superfluo per evitare doppi trigger
+            handlePageChange(page);
         } else if (isInitialLoad && page === 'addTransaction') {
             // Assicurati che lo sticky submit sia visibile
             showStickySubmit();
@@ -442,8 +530,8 @@ function updatePageTitle(page) {
                 case 'addTransaction':
                     iconSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='12' y1='5' x2='12' y2='19'/><line x1='5' y1='12' x2='19' y2='12'/></svg>`;
                     break;
-                case 'shared':
-                    iconSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2'/><circle cx='9' cy='7' r='4'/><path d='M23 21v-2a4 4 0 0 0-3-3.87'/><path d='M16 3.13a4 4 0 0 1 0 7.75'/></svg>`;
+                case 'budget':
+                    iconSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 1v22'/><path d='M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6'/></svg>`;
                     break;
                 case 'settings':
                     iconSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='3'/><path d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 5 15.4a1.65 1.65 0 0 0-1.51-1V13a2 2 0 0 1 0-4v-.09A1.65 1.65 0 0 0 4.6 8a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09c.38.07.73.24 1 .51a1.65 1.65 0 0 0 1.82.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 8c.07.38.24.73.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-.51 1z'/></svg>`;
@@ -469,10 +557,15 @@ function handlePageChange(page) {
             // Questo è utile se il nome viene cambiato e poi si torna alla dashboard
             // senza ricaricare l'intera app.
             updateWelcomeMessage();
+            // Revalidazione silenziosa dei dati base e KPI (SWR)
+            loadSpreadsheetData({ silent: true, force: true });
+            updateMonthlyStats({ force: true });
+            startDashboardAutoRefresh();
             break;
         case 'transaction':
             updateTransactionsPage();
             hideStickySubmit();
+            stopDashboardAutoRefresh();
             break;
         case 'addTransaction':
             showStickySubmit();
@@ -486,16 +579,19 @@ function handlePageChange(page) {
                     }
                 }, 150);
             }
+            stopDashboardAutoRefresh();
             break;
-        case 'shared':
-            // Per ora non fa nulla, pagina placeholder
+        case 'budget':
+            updateBudgetPage();
             hideStickySubmit();
+            stopDashboardAutoRefresh();
             break;
         case 'settings':
             updateLastConnectionTime();
             populateUserPreferencesInputs(); // Popola input per preferenze utente
             populateBackendConfigInputs(); // Popola input per URL backend
             hideStickySubmit();
+            stopDashboardAutoRefresh();
             break;
     }
 }
@@ -611,34 +707,144 @@ function updateTransactionsPage() {
     loadTransactionsList();
 }
 
-async function loadTransactionsList() {
+// ===============================================
+// BUDGET PAGE MANAGEMENT
+// ===============================================
+
+function updateBudgetPage() {
+    // SWR: mostra prima i budget locali se presenti, poi revalidate silenzioso
+    if (AppState.cachedBudgets) {
+        displayBudgetCards(AppState.cachedBudgets);
+    } else {
+        const budgetGridEl = document.getElementById('budgetGrid');
+        if (budgetGridEl) {
+            budgetGridEl.innerHTML = '<div class="skeleton skeleton--text"></div>'.repeat(6);
+        }
+    }
+    loadBudgetData({ silent: true });
+}
+
+async function loadBudgetData(options = {}) {
+    const { silent = false, force = false } = options;
+    const budgetGridEl = document.getElementById('budgetGrid');
+    if (!budgetGridEl) return;
+
+    // Freshness check
+    const now = Date.now();
+    if (!force && Freshness.budgets && now - Freshness.budgets < CONFIG.CACHE.TTL.BUDGETS) {
+        if (AppState.cachedBudgets) {
+            displayBudgetCards(AppState.cachedBudgets);
+            return;
+        }
+    }
+
+    try {
+        const response = await fetch(AppState.userConfig.googleAppsScriptUrl + '?action=getBudgets');
+        const data = await response.json();
+        if (!data.success) throw new Error(data.message || 'Errore getBudgets');
+        AppState.cachedBudgets = data.budgets || [];
+        displayBudgetCards(AppState.cachedBudgets);
+        AppState._loading.budgetsLoaded = true;
+        Freshness.budgets = Date.now();
+    } catch (error) {
+        DEBUG.error('Errore caricamento budget', error);
+        budgetGridEl.innerHTML = `<div style="text-align:center; padding:40px; color:#666;">
+            <div style=\"font-size:48px; margin-bottom:12px;\">❌</div>
+            <div>Errore nel caricamento dei budget</div>
+        </div>`;
+    }
+}
+
+function displayBudgetCards(budgets) {
+    const budgetGridEl = document.getElementById('budgetGrid');
+    if (!budgetGridEl) return;
+
+    if (!budgets || budgets.length === 0) {
+        budgetGridEl.innerHTML = `<div style="text-align:center; padding:40px; color:#666;">
+            <div style=\"font-size:48px; margin-bottom:12px;\">🗂️</div>
+            <div>Nessun budget definito</div>
+        </div>`;
+        return;
+    }
+
+    const cardsHTML = budgets.map(b => {
+        const budget = parseFloat(b.budget) || 0;
+        const spent = parseFloat(b.spent) || 0;
+        const remaining = Math.max(budget - spent, 0);
+        const pct = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
+        const fillClass = pct >= 90 ? 'danger' : (pct >= 70 ? 'warning' : '');
+        return `
+            <div class="budget-card">
+                <div class="budget-card-header">
+                    <div class="budget-category">${b.category}</div>
+                    <div class="budget-amounts">
+                        <span class="amount-strong">${NumberUtils.formatCurrency(budget)}</span>
+                        <span>budget</span>
+                    </div>
+                </div>
+                <div class="budget-amounts" style="justify-content: space-between;">
+                    <span>Speso: <span class="amount-strong">${NumberUtils.formatCurrency(spent)}</span></span>
+                    <span>Rimanente: <span class="amount-strong">${NumberUtils.formatCurrency(remaining)}</span></span>
+                </div>
+                <div class="progress-bar" aria-label="Progresso budget ${b.category}">
+                    <div class="progress-bar-fill ${fillClass}" style="width: ${pct.toFixed(0)}%"></div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    budgetGridEl.innerHTML = cardsHTML;
+}
+
+async function loadTransactionsList(options = {}) {
+    const { force = false } = options;
     const transactionsListEl = document.getElementById('transactionsList');
     if (!transactionsListEl) return;
-    showGlobalLoading();
-    // Mostra skeleton loading
-    showTransactionsLoading();
-    
-    // Se abbiamo già i dati, mostrali
+
+    // Evita richieste duplicate
+    if (AppState._loading.transactionsInFlight) return;
+
+    // Se i dati sono già disponibili e non è forzato, mostra e termina senza skeleton
+    if (!force && AppState._loading.transactionsLoaded && AppState.datiSpreadsheet.transazioni?.length) {
+        displayTransactionsList(AppState.datiSpreadsheet.transazioni);
+        return;
+    }
+
+    // Se abbiamo dati in memoria (es. da initialData), usali senza fetch
     if (AppState.datiSpreadsheet.transazioni && AppState.datiSpreadsheet.transazioni.length > 0) {
         displayTransactionsList(AppState.datiSpreadsheet.transazioni);
-        hideGlobalLoading();
-    } else {
-        // Carica dati da Google Sheets
-        try {
-            const response = await fetch(AppState.userConfig.googleAppsScriptUrl + '?action=getTransactions');
-            const data = await response.json();
-            if (data.success) {
-                AppState.datiSpreadsheet.transazioni = data.transactions || [];
-                displayTransactionsList(AppState.datiSpreadsheet.transazioni);
-            } else {
-                throw new Error(data.message || 'Errore nel caricamento transazioni');
-            }
-        } catch (error) {
-            DEBUG.error('Errore nel caricamento transazioni', error);
-            showTransactionsError();
-        } finally {
-            hideGlobalLoading();
+        AppState._loading.transactionsLoaded = true;
+        return;
+    }
+
+    // Freshness: se i dati sono freschi evita fetch e skeleton
+    const now = Date.now();
+    if (Freshness.transactions && now - Freshness.transactions < CONFIG.CACHE.TTL.TRANSACTIONS && AppState.datiSpreadsheet.transazioni?.length) {
+        displayTransactionsList(AppState.datiSpreadsheet.transazioni);
+        return;
+    }
+
+    // Mostra skeleton solo se dobbiamo davvero caricare
+    showTransactionsLoading();
+
+    // Carica dati da Google Sheets
+    AppState._loading.transactionsInFlight = true;
+    try {
+        const response = await fetch(AppState.userConfig.googleAppsScriptUrl + '?action=getTransactions');
+        const data = await response.json();
+        if (data.success) {
+            AppState.datiSpreadsheet.transazioni = data.transactions || [];
+            displayTransactionsList(AppState.datiSpreadsheet.transazioni);
+            AppState._loading.transactionsLoaded = true;
+            Freshness.transactions = Date.now();
+        } else {
+            throw new Error(data.message || 'Errore nel caricamento transazioni');
         }
+    } catch (error) {
+        DEBUG.error('Errore nel caricamento transazioni', error);
+        showTransactionsError();
+    } finally {
+        AppState._loading.transactionsInFlight = false;
     }
 }
 
@@ -789,10 +995,25 @@ function initializeAmountInput() {
 // DATA MANAGEMENT
 // ===============================================
 
-async function loadSpreadsheetData() {
+async function loadSpreadsheetData(options = {}) {
+    const { silent = false, force = false } = options;
     DEBUG.log('loadSpreadsheetData chiamata');
-    updateConnectionStatus(APP_STATES.LOADING, 'Caricamento dati...');
-    showGlobalLoading();
+    // Freshness check: evita refetch frequenti
+    const now = Date.now();
+    if (!force && Freshness.initialData && now - Freshness.initialData < CONFIG.CACHE.TTL.INITIAL_DATA) {
+        DEBUG.log('Initial data fresh, skip fetch');
+        updateConnectionStatus(APP_STATES.SUCCESS, 'Connesso al Google Sheet');
+        if (AppState.currentPage === 'dashboard') {
+            updateAccountBalances();
+            updateRecentTransactions();
+        } else if (AppState.currentPage === 'transaction') {
+            updateTransactionsPage();
+        }
+        return;
+    }
+    if (!silent) {
+        updateConnectionStatus(APP_STATES.LOADING, 'Caricamento dati...');
+    }
     try {
         const response = await fetch(AppState.userConfig.googleAppsScriptUrl + '?action=getInitialData');
         if (!response.ok) {
@@ -808,12 +1029,18 @@ async function loadSpreadsheetData() {
             // in base al tipo di transazione corrente.
             updateFieldVisibility(); 
             DEBUG.log('Chiamata updateConnectionStatus con SUCCESS');
-            updateConnectionStatus(APP_STATES.SUCCESS, 'Connesso al Google Sheet');
+            if (!silent) {
+                updateConnectionStatus(APP_STATES.SUCCESS, 'Connesso al Google Sheet');
+            }
             updateLastConnectionTime();
+            AppState._loading.initialDataLoaded = true;
+            Freshness.initialData = Date.now();
             
-            // Aggiorna dashboard se siamo sulla pagina dashboard
+            // Aggiorna contenuti pagina corrente senza duplicare KPI
             if (AppState.currentPage === 'dashboard') {
-                updateDashboard();
+                // Evita di ritriggerare KPI: aggiorna solo conti e transazioni recenti
+                updateAccountBalances();
+                updateRecentTransactions();
             }
             
             // Aggiorna transazioni se siamo sulla pagina transazioni
@@ -827,10 +1054,12 @@ async function loadSpreadsheetData() {
         }
     } catch (error) {
         DEBUG.error('Errore nel caricamento dati', error);
-        updateConnectionStatus(APP_STATES.ERROR, 'Errore di connessione');
-        showMessage('error', 'Impossibile collegarsi al Google Sheet: ' + error.message);
+        if (!silent) {
+            updateConnectionStatus(APP_STATES.ERROR, 'Errore di connessione');
+            showMessage('error', 'Impossibile collegarsi al Google Sheet: ' + error.message);
+        }
     } finally {
-        hideGlobalLoading();
+        // Evita overlay globale: UI resta reattiva, feedback in header/avatar
     }
 }
 
@@ -905,21 +1134,150 @@ function updateConnectionStatus(status, text) {
 
 function updateDashboard() {
     DEBUG.log('Aggiornamento dashboard semplificata...');
-    
+    // Skeleton per Net Worth finché i dati iniziali non sono disponibili
+    if (!AppState._loading || !AppState._loading.initialDataLoaded) {
+        setNetWorthLoading(true);
+    } else {
+        setNetWorthLoading(false);
+    }
+
+    // Aggiorna immediatamente le KPI dai dati locali se disponibili (stale-while-revalidate)
+    updateKpiFromLocalDataIfAvailable();
+
+    // Aggiorna i contenuti esistenti senza cancellarli inutilmente
     updateAccountBalances();
+    // Chiama KPI: mostrerà skeleton solo se stiamo davvero fetchando
     updateMonthlyStats();
     updateRecentTransactions();
 }
 
-async function updateMonthlyStats() {
+// Loader locali per le KPI della dashboard
+function setDashboardStatsLoading(isLoading) {
+    const idsAmount = ['monthlyIncome','monthlyExpenses','monthlyNet','monthlySpendingPct','savingRate'];
+    const idsText = ['incomeChange','expenseChange','savingRateChange'];
+
+    idsAmount.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (isLoading) {
+            el.textContent = '';
+            el.classList.add('skeleton','skeleton--amount');
+        } else {
+            el.classList.remove('skeleton','skeleton--amount','positive','negative');
+            el.style.removeProperty('color');
+        }
+    });
+
+    idsText.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (isLoading) {
+            el.textContent = '';
+            el.classList.add('skeleton','skeleton--text');
+        } else {
+            el.classList.remove('skeleton','skeleton--text');
+        }
+    });
+}
+
+// Skeleton per Net Worth (saldo totale)
+function setNetWorthLoading(isLoading) {
+    const el = document.getElementById('totalBalance');
+    if (!el) return;
+    if (isLoading) {
+        el.textContent = '';
+        el.classList.add('skeleton','skeleton--amount');
+    } else {
+        el.classList.remove('skeleton','skeleton--amount');
+    }
+}
+
+// ===============================================
+// LOCAL KPI COMPUTATION (INSTANT, SWR)
+// ===============================================
+
+function updateKpiFromLocalDataIfAvailable() {
+    try {
+        if (!AppState._loading || !AppState._loading.initialDataLoaded) return;
+        const transactions = AppState?.datiSpreadsheet?.transazioni || [];
+        if (!transactions.length) return;
+        const stats = calculateMonthlyStatsFromTransactions(transactions);
+        displayMonthlyStats(stats);
+    } catch (e) {
+        DEBUG.error('Errore calcolo KPI locali', e);
+    }
+}
+
+function calculateMonthlyStatsFromTransactions(transactions) {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    const prevDate = new Date(currentYear, currentMonth - 1, 1);
+    const prevMonth = prevDate.getMonth();
+    const prevYear = prevDate.getFullYear();
+
+    const sumFor = (filterFn) => transactions.reduce((sum, t) => {
+        const amount = parseFloat(t['Importo (€)']) || 0;
+        const date = t.Data ? new Date(t.Data) : null;
+        if (!date) return sum;
+        return filterFn(date, amount) ? sum + amount : sum;
+    }, 0);
+
+    // Corrente
+    const incomeCurrent = sumFor((d, a) => d.getMonth() === currentMonth && d.getFullYear() === currentYear && a > 0);
+    const expenseCurrent = Math.abs(sumFor((d, a) => d.getMonth() === currentMonth && d.getFullYear() === currentYear && a < 0));
+
+    // Precedente
+    const incomePrev = sumFor((d, a) => d.getMonth() === prevMonth && d.getFullYear() === prevYear && a > 0);
+    const expensePrev = Math.abs(sumFor((d, a) => d.getMonth() === prevMonth && d.getFullYear() === prevYear && a < 0));
+
+    const calculateSavingRate = (income, expenses) => {
+        if (!income || income <= 0) return 0;
+        const savings = income - expenses;
+        return Math.max(-100, Math.min(100, (savings / income) * 100));
+    };
+
+    const currentSavingRate = calculateSavingRate(incomeCurrent, expenseCurrent);
+    const prevSavingRate = calculateSavingRate(incomePrev, expensePrev);
+
+    const incomeChange = NumberUtils.calculatePercentageChange(incomeCurrent, incomePrev);
+    const expenseChange = NumberUtils.calculatePercentageChange(expenseCurrent, expensePrev);
+    const savingRateChange = prevSavingRate !== 0 ? currentSavingRate - prevSavingRate : 0;
+
+    return {
+        monthlyIncome: incomeCurrent,
+        monthlyExpenses: expenseCurrent,
+        incomeChange,
+        expenseChange,
+        savingRateChange
+    };
+}
+
+async function updateMonthlyStats(options = {}) {
+    const { force = false } = options;
+    // Evita richieste duplicate
+    if (AppState._loading.monthlyStatsInFlight) return;
+
+    // Se i dati sono freschi, non toccare i valori attuali né mostrare skeleton
+    const now = Date.now();
+    if (!force && Freshness.dashboardStats && now - Freshness.dashboardStats < CONFIG.CACHE.TTL.DASHBOARD_STATS) {
+        DEBUG.log('Dashboard stats fresh, skip fetch');
+        // Assicurati che eventuali skeleton precedentemente impostati vengano rimossi
+        setDashboardStatsLoading(false);
+        return;
+    }
+
+    AppState._loading.monthlyStatsInFlight = true;
     // Carica statistiche reali o usa dati simulati come fallback
-    showGlobalLoading();
+    // Non mostrare skeleton: i valori sono già stati mostrati via calcolo locale (SWR)
     try {
         const response = await fetch(AppState.userConfig.googleAppsScriptUrl + '?action=getDashboardStats');
         const data = await response.json();
         if (data.success) {
             displayMonthlyStats(data);
             DEBUG.log('Stats mensili reali caricate', data);
+            AppState._loading.monthlyStatsLoaded = true;
+            Freshness.dashboardStats = Date.now();
         } else {
             throw new Error(data.message || 'Errore nel caricamento statistiche');
         }
@@ -928,7 +1286,8 @@ async function updateMonthlyStats() {
         // Fallback ai dati simulati
         displayMonthlyStatsSimulated();
     } finally {
-        hideGlobalLoading();
+        // Nessun skeleton da gestire qui
+        AppState._loading.monthlyStatsInFlight = false;
     }
 }
 
@@ -1092,6 +1451,8 @@ function updateSavingRateIndicator(savingRate) {
 }
 
 function updateAccountBalances() {
+    // Evita di sovrascrivere i placeholder prima che i dati iniziali siano disponibili
+    if (!AppState._loading || !AppState._loading.initialDataLoaded) return;
     const totalBalanceEl = document.getElementById('totalBalance');
     const accountsListEl = document.getElementById('accountsList');
     
@@ -1114,11 +1475,16 @@ function updateAccountBalances() {
             `;
         });
         
-        if (totalBalanceEl) totalBalanceEl.textContent = NumberUtils.formatCurrency(totalBalance); // totalBalanceEl è già un .balance-value
+        if (totalBalanceEl) {
+            // Togli skeleton net worth e imposta il valore
+            setNetWorthLoading(false);
+            totalBalanceEl.textContent = NumberUtils.formatCurrency(totalBalance);
+        }
         accountsListEl.innerHTML = accountsHTML;
         
         DEBUG.log('Saldi aggiornati', { totalBalance, accounts: AppState.datiSpreadsheet.conti.length });
     } else {
+        setNetWorthLoading(false);
         totalBalanceEl.textContent = NumberUtils.formatCurrency(0);
         accountsListEl.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">Nessun conto trovato</div>';
     }
@@ -1128,6 +1494,8 @@ function updateAccountBalances() {
 }
 
 function updateRecentTransactions() {
+    // Evita di sovrascrivere i placeholder prima che i dati iniziali siano disponibili
+    if (!AppState._loading || !AppState._loading.initialDataLoaded) return;
     const recentTransactionsEl = document.getElementById('recentTransactions');
     if (!recentTransactionsEl) return;
     
@@ -2006,7 +2374,6 @@ async function submitTransactions(transactions, submitTextEl, submitSpinnerEl) {
 async function submitEditTransactionOnServer(transactionId, updatedData, submitTextEl, submitSpinnerEl) {
     AppState.isLoading = true;
     setSubmitButtonsLoading(true, submitTextEl, submitSpinnerEl);
-    showGlobalLoading();
     showMessage('loading', 'Salvataggio modifiche in corso...');
     const formData = new URLSearchParams();
     formData.append('action', 'editTransaction');
@@ -2036,7 +2403,7 @@ async function submitEditTransactionOnServer(transactionId, updatedData, submitT
     } finally {
         AppState.isLoading = false;
         setSubmitButtonsLoading(false, submitTextEl, submitSpinnerEl);
-        hideGlobalLoading();
+        // Nessun overlay globale da nascondere
     }
 }
 
@@ -2358,6 +2725,7 @@ window.syncSubmitButtons = syncSubmitButtons;
 window.initiateEditTransaction = initiateEditTransaction; // Esponi globalmente
 window.confirmDeleteTransaction = confirmDeleteTransaction; // Esponi globalmente
 window.cancelEditMode = cancelEditMode; // Esponi globalmente
+window.loadBudgetData = loadBudgetData; // opzionale per debug
 
 // ===============================================
 // PERFORMANCE/ID UTILITIES
