@@ -5,10 +5,10 @@
 // Default Configuration
 const CONFIG = {
     // URL del Google Apps Script
-    DEFAULT_GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzalmecL4CyRQguIKV1ng9-ZYCOxgrpQSd4Sex57LI7Zcf3iKOmjAwP0bTM4eafgK0/exec',
+    DEFAULT_GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxfWeO1t1v_udq3x2OXZKc-Ty1Qp4JDwNXUJ4BO1KpwdGo9D3pAZ7P3x0d_DF4PxMrfHQ/exec',
     
     // ID del Google Sheet (per aprire il link diretto)
-    DEFAULT_GOOGLE_SHEET_ID: '1HbC77mPPxFm378OnJXqnoyRrEGzIp1WBooth37sZWXU',
+    DEFAULT_GOOGLE_SHEET_ID: '1oMGygtZxVOjoFdkXZ0Gb3oe_gQbHUy1tCzg-1YsNgk4',
     
     // URL diretto del Google Sheet
     get DEFAULT_GOOGLE_SHEET_URL() {
@@ -19,8 +19,8 @@ const CONFIG = {
     LOOKER_STUDIO_URL: null, // Imposta quando crei la dashboard
     
     // Impostazioni app
-    APP_NAME: 'Finance App',
-    VERSION: '1.5 PWA',
+    APP_NAME: 'PersonalFinance App',
+    VERSION: '2.0 PWA',
     
     // Timeout per le richieste (in millisecondi)
     REQUEST_TIMEOUT: 30000,
@@ -130,7 +130,7 @@ const NUMBER_FORMAT = {
 
 // Utility function per logging (solo in development)
 const DEBUG = {
-    enabled: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
+    enabled: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:',
     
     log: function(message, data = null) {
         if (this.enabled) {
