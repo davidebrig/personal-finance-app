@@ -31,6 +31,8 @@
     --color-text-secondary: #8E8E93;
     --color-text-tertiary: #C7C7CC;
     --color-text-quaternary: #D1D1D6;
+    --color-text-light: var(--color-text-tertiary);
+    --color-text-light: var(--color-text-tertiary);
     
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, #007AFF 0%, #5AC8FA 100%);
@@ -100,13 +102,13 @@
   
   /* Component Heights */
   --header-height: 56px;
-  --bottom-nav-height: 65px;
-  --bottom-nav-total-height: calc(65px + var(--safe-area-inset-bottom));
+  --bottom-nav-height: 54px;
+  --bottom-nav-total-height: calc(var(--bottom-nav-height) + var(--safe-area-inset-bottom));
   --sticky-submit-height: 70px;
   
   /* iOS-specific safe area adjustments */
   --ios-bottom-safe-area: max(env(safe-area-inset-bottom), 20px);
-  --ios-bottom-nav-total-height: calc(65px + var(--ios-bottom-safe-area));
+  --ios-bottom-nav-total-height: calc(var(--bottom-nav-height) + var(--ios-bottom-safe-area));
   }
   
   /* ===============================================
@@ -289,6 +291,17 @@
     background: var(--color-primary-light);
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
+  }
+  
+  /* Focus visible states (accessibility) */
+  .btn:focus-visible,
+  .nav-item:focus-visible,
+  .form-input:focus-visible,
+  .form-select:focus-visible,
+  .tipo-btn:focus-visible,
+  .balance-toggle-btn:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
   }
   
   .btn:active {
@@ -1055,8 +1068,6 @@
   .transactions-list {
     display: grid;
     gap: 0;
-    max-height: 70vh;
-    overflow-y: auto;
   }
   
   .transaction-item {
@@ -1207,7 +1218,7 @@
   @supports (padding: max(0px)) {
     .bottom-nav {
       padding-bottom: max(var(--ios-bottom-safe-area), 20px);
-      height: calc(65px + max(var(--ios-bottom-safe-area), 20px));
+      height: calc(var(--bottom-nav-height) + max(var(--ios-bottom-safe-area), 20px));
     }
   }
   
@@ -1215,7 +1226,7 @@
   @media screen and (max-width: 428px) {
     .bottom-nav {
       padding-bottom: max(var(--ios-bottom-safe-area), 34px);
-      height: calc(65px + max(var(--ios-bottom-safe-area), 34px));
+      height: calc(var(--bottom-nav-height) + max(var(--ios-bottom-safe-area), 34px));
     }
   }
   
@@ -1223,7 +1234,7 @@
   @supports (-webkit-touch-callout: none) {
     .bottom-nav {
       padding-bottom: max(var(--ios-bottom-safe-area), 34px);
-      height: calc(65px + max(var(--ios-bottom-safe-area), 34px));
+      height: calc(var(--bottom-nav-height) + max(var(--ios-bottom-safe-area), 34px));
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
@@ -1315,6 +1326,12 @@
     line-height: 1;
   }
   
+  /* Increase bottom bar icon size per iOS HIG while keeping header/icons elsewhere unchanged */
+  .bottom-nav .nav-icon {
+    width: 26px;
+    height: 26px;
+  }
+  
   .nav-icon--add {
     font-size: 24px;
     font-weight: 400;
@@ -1328,7 +1345,7 @@
   }
   
   .nav-label {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 500;
     line-height: 1.2;
     margin-top: 1px;
@@ -1392,6 +1409,92 @@
     display: none;
     width: 100%;
     animation: fadeIn 0.3s ease-out;
+  }
+
+  /* ===============================================
+     BUDGET PAGE
+     =============================================== */
+  .budget-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+  
+  @media (min-width: 480px) {
+    .budget-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .budget-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  .budget-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  }
+  
+  .budget-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .budget-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-md);
+  }
+  
+  .budget-category {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text);
+  }
+  
+  .budget-amounts {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-sm);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+  }
+  
+  .budget-amounts .amount-strong {
+    color: var(--color-text);
+    font-weight: var(--font-weight-semibold);
+  }
+  
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #F0F0F0;
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    position: relative;
+    margin-top: var(--space-sm);
+  }
+  
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--color-primary);
+    width: 0%;
+    transition: width var(--transition-normal);
+  }
+  
+  .progress-bar-fill.warning {
+    background: var(--color-warning);
+  }
+  
+  .progress-bar-fill.danger {
+    background: var(--color-error);
   }
   
   .page.active {
@@ -1668,6 +1771,12 @@
       font-size: 20px;
     }
     
+    /* Slightly larger bottom bar icons also on small phones */
+    .bottom-nav .nav-icon {
+      width: 24px;
+      height: 24px;
+    }
+    
     .nav-label {
       font-size: 10px;
     }
@@ -1767,9 +1876,9 @@
     :root {
       --max-width-mobile: 100%;
       --header-height: 70px;
-      --bottom-nav-height: 70px;
+      --bottom-nav-height: 60px;
       --safe-area-inset-bottom: 0px;
-      --ios-bottom-nav-total-height: calc(70px + var(--ios-bottom-safe-area));
+      --ios-bottom-nav-total-height: calc(var(--bottom-nav-height) + var(--ios-bottom-safe-area));
     }
   
     .app-container {
@@ -1895,6 +2004,13 @@
     .nav-item--add:active {
       transform: scale(0.95);
     }
+    
+    /* Subtle tap feedback */
+    .btn:active,
+    .tipo-btn:active,
+    .balance-toggle-btn:active {
+      opacity: 0.85;
+    }
   }
   
   /* Reduced motion */
@@ -1915,6 +2031,32 @@
     .spinner {
       animation: none;
     }
+  }
+  
+  /* Dark mode */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-background: #1C1C1E;
+      --color-surface: #2C2C2E;
+      --color-surface-secondary: #3A3A3C;
+      --color-border: #3A3A3C;
+      --color-text: #F2F2F7;
+      --color-text-secondary: #A1A1AA;
+    }
+    
+    .card, .stat-card, .balance-card, .saving-rate-card, .analytics-card,
+    .form-container, .message, .account-item, .settings-item {
+      border-color: var(--color-border);
+    }
+    
+    .bottom-nav {
+      background: rgba(28,28,30,0.92);
+      border-top-color: rgba(255,255,255,0.08);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    
+    .progress-bar { background: #3A3A3C; }
   }
   
   /* ===============================================
