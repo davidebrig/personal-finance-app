@@ -12,19 +12,11 @@
     <!-- Meta tags per PWA -->
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Finance">
 
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-    <!-- Per la status bar nera su iPhone -->
-    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
-
     <!-- Icone per iOS -->
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
 
     <!-- Registrazione Service Worker -->
     <script>
@@ -77,6 +69,9 @@
                         <div class="balance-label">Net Worth</div>
                     </div>
 
+                    <!-- Section heading for current month metrics -->
+                    <h2 class="section-title">Questo mese</h2>
+
                     <!-- Quick Stats -->
                     <div class="stats-grid">
                         <div class="stat-card stat-card--income">
@@ -97,6 +92,31 @@
                             <div class="stat-value balance-value" id="monthlyExpenses">€ 0</div>
                                 <div class="stat-label">Uscite mese</div>
                                 <div class="stat-change" id="expenseChange">+0%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Monthly Net + Spending % Grid -->
+                    <div class="stats-grid">
+                        <!-- Monthly Net Balance Box (Entrate - Uscite) -->
+                        <div class="stat-card stat-card--net">
+                            <div class="stat-icon"> <!-- ➖/➕ -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+ </div>
+                            <div class="stat-content">
+                                <div class="stat-value balance-value" id="monthlyNet">€ 0</div>
+                                <div class="stat-label">Saldo del mese</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Monthly Spending Percentage Box (Uscite/Entrate * 100) -->
+                        <div class="stat-card stat-card--spending">
+                            <div class="stat-icon"> <!-- % -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+ </div>
+                            <div class="stat-content">
+                                <div class="stat-value balance-value" id="monthlySpendingPct">0%</div>
+                                <div class="stat-label">Speso del mese</div>
                             </div>
                         </div>
                     </div>
@@ -162,22 +182,7 @@
 
             <!-- Transactions Page -->
             <section id="transactionPage" class="page">
-                <!-- Il titolo della card ora è un titolo di sezione diretto -->
-                <div class="card-title section-title">
-                    <!-- HEADER TRANSAZIONI -->
-                    <h1 class="header-title" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 1.125rem; font-weight: 600; margin: 0 0 12px 0;">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                      <span>Transazioni</span>
-                    </h1>
-                    <button class="btn btn--primary" onclick="changePage('addTransaction')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        <!-- HEADER NUOVO RECORD -->
-                        <h1 class="header-title" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 1.125rem; font-weight: 600; margin: 0 0 12px 0;">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                          <span>Nuovo record</span>
-                        </h1>
-                    </button>
-                </div>
+                
                 <div class="transactions-list" id="transactionsList">
                     <div class="skeleton skeleton--text"></div>
                     <div class="skeleton skeleton--text"></div>
@@ -203,7 +208,7 @@
                                 </button>
                                 <!-- Tipo transazione: Trasferimento -->
                                 <button type="button" class="tipo-btn tipo-btn--transfer" data-tipo="trasferimento">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.13-3.36L23 10M1 14l5.36 5.36A9 9 0 0020.49 15"/></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-3"/><path d="M12 3v6m0 0l3-3m-3 3L9 6"/></svg>
                                     Trasferimento
                                 </button>
                         </div>
@@ -288,13 +293,7 @@
                         <input type="date" id="data" name="data" class="form-input" required>
                     </div>
 
-                        <!-- Bottoni azione -->
-                        <div class="form-group button-group">
-                            <button type="submit" id="submitBtn" class="btn btn--submit btn--expense">
-                                <span id="submitText">Salva Transazione</span>
-                                <span id="submitSpinner" class="spinner hidden"></span>
-                            </button>
-                        </div>
+                        <!-- Bottoni azione - Rimosso il bottone non sticky, rimane solo quello sticky -->
                 </form>
                 <div id="message" class="message hidden"></div>
             </section>
