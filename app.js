@@ -110,6 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeApp() {
+    console.log('🚀 App inizializzazione iniziata...');
     initializeNavigation();
     initializeTransactionForm();
     initializeConnectionStatus();
@@ -131,7 +132,12 @@ function initializeApp() {
     changePage(initialPage, true); // true per indicare caricamento iniziale
     updateLastConnectionTime(); // Chiamato dopo il setup della pagina
     
+    // Avvia il caricamento dei dati e aggiorna lo stato di connessione
+    DEBUG.log('Avvio caricamento dati iniziale...');
+    loadSpreadsheetData();
+    
     DEBUG.log('App completa inizializzata con successo');
+    console.log('✅ App inizializzazione completata!');
 }
 
 function initializeUserPreferences() {
@@ -371,6 +377,16 @@ function changePage(page, isInitialLoad = false) {
     if (targetPage) {
         targetPage.classList.add('active');
         AppState.currentPage = page;
+
+        // Gestione header trasparente solo in dashboard
+        const appHeader = document.querySelector('.app-header');
+        if (appHeader) {
+            if (page === 'dashboard') {
+                appHeader.classList.add('header--transparent');
+            } else {
+                appHeader.classList.remove('header--transparent');
+            }
+        }
         
         // Aggiorna nav item attivo
         const navItem = document.querySelector(`[data-page="${page}"]`);
@@ -406,11 +422,20 @@ function updatePageTitle(page) {
             let iconSVG = '';
             switch(page) {
                 case 'dashboard':
-                    iconSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='12' width='4' height='8'/><rect x='9' y='8' width='4' height='12'/><rect x='15' y='4' width='4' height='16'/></svg>`;
-                    pageConfig.title = 'Personal Finance App';
+                    // Usa il logo dell'app invece dell'icona
+                    iconSVG = `<img src="icons/icon-48.png" alt="Logo" style="width: 32px; height: 32px; border-radius: 8px;">`;
+                    // Usa il messaggio di benvenuto personalizzato
+                    const userName = AppState.userPreferences?.userName;
+                    if (userName && userName.trim()) {
+                        pageConfig.title = `Ciao ${userName}! 👋`;
+                    } else {
+                        pageConfig.title = 'Personal Finance App';
+                    }
+                    // Aggiungi classe per centrare il titolo
+                    titleEl.classList.add('dashboard-title');
                     break;
                 case 'transaction':
-                    iconSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 8v8m0 0l-4-4m4 4l4-4'/></svg>`;
+                    iconSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='8' y1='6' x2='21' y2='6'/><line x1='8' y1='12' x2='21' y2='12'/><line x1='8' y1='18' x2='21' y2='18'/><line x1='3' y1='6' x2='3.01' y2='6'/><line x1='3' y1='12' x2='3.01' y2='12'/><line x1='3' y1='18' x2='3.01' y2='18'/></svg>`;
                     break;
                 case 'addTransaction':
                     iconSVG = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='12' y1='5' x2='12' y2='19'/><line x1='5' y1='12' x2='19' y2='12'/></svg>`;
@@ -423,6 +448,8 @@ function updatePageTitle(page) {
                     break;
             }
             titleEl.innerHTML = `<span style="display: flex; align-items: center; gap: 10px;">${iconSVG} ${pageConfig.title}</span>`;
+            // Rimuovi la classe dashboard-title se presente
+            titleEl.classList.remove('dashboard-title');
             if (closeEditBtn) closeEditBtn.classList.add('hidden');
         } else if (AppState.currentPage === 'addTransaction' && page === 'addTransaction') {
             titleEl.innerHTML = `<span style="display: flex; align-items: center; gap: 10px;"><svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='12' y1='5' x2='12' y2='19'/><line x1='5' y1='12' x2='19' y2='12'/></svg> Nuovo record</span>`;
@@ -777,6 +804,7 @@ function initializeAmountInput() {
 // ===============================================
 
 async function loadSpreadsheetData() {
+    DEBUG.log('loadSpreadsheetData chiamata');
     updateConnectionStatus(APP_STATES.LOADING, 'Caricamento dati...');
     showGlobalLoading();
     try {
@@ -785,6 +813,7 @@ async function loadSpreadsheetData() {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+        DEBUG.log('Risposta dal server:', { success: data.success, hasData: !!data.data });
         if (data.success) {
             AppState.datiSpreadsheet = data.data;
             // Popola solo i conti qui, le categorie verranno gestite da updateFieldVisibility
@@ -792,6 +821,7 @@ async function loadSpreadsheetData() {
             // Ora che i dati ci sono, aggiorna la visibilità e i filtri del form
             // in base al tipo di transazione corrente.
             updateFieldVisibility(); 
+            DEBUG.log('Chiamata updateConnectionStatus con SUCCESS');
             updateConnectionStatus(APP_STATES.SUCCESS, 'Connesso al Google Sheet');
             updateLastConnectionTime();
             
@@ -820,24 +850,10 @@ async function loadSpreadsheetData() {
 
 function updateConnectionStatus(status, text) {
     AppState.connectionStatus = status;
-    
     const statusEl = document.getElementById('connectionStatus');
-    if (!statusEl) return;
+    DEBUG.log('updateConnectionStatus chiamata:', { status, text, statusElFound: !!statusEl });
     
-    // Rimuovi classi di stato precedenti
-    statusEl.classList.remove('success', 'error', 'loading');
-    
-    // Aggiorna il dot
-    const dot = statusEl.querySelector('.status-dot');
-    if (dot) {
-        dot.className = `status-dot ${status}`;
-    }
-    
-    // Aggiorna contenuto e classe
-    statusEl.innerHTML = `<span class="status-dot ${status}"></span><span class="status-text">${text}</span>`;
-    statusEl.classList.add(status);
-    
-    // Aggiorna testo in base allo stato
+    // Prepara il testo di visualizzazione
     let displayText = text;
     if (status === APP_STATES.SUCCESS) {
         displayText = 'Connesso';
@@ -847,8 +863,41 @@ function updateConnectionStatus(status, text) {
         displayText = 'Connessione...';
     }
     
-    statusEl.innerHTML = `<span class="status-dot ${status}"></span><span class="status-text">${displayText}</span>`;
-    
+    // Aggiorna connectionStatus se esiste
+    if (statusEl) {
+        // Rimuovi classi di stato precedenti
+        statusEl.classList.remove('success', 'error', 'loading');
+
+        // Aggiorna il dot
+        const dot = statusEl.querySelector('.status-dot');
+        if (dot) {
+            dot.className = `status-dot ${status}`;
+        }
+
+        // Aggiorna contenuto e classe
+        statusEl.innerHTML = `<span class="status-dot ${status}"></span><span class="status-text">${displayText}</span>`;
+        statusEl.classList.add(status);
+    }
+
+    // Gestione stato profilo/avatar (sempre eseguita)
+    const profileAvatar = document.getElementById('profileAvatar');
+    DEBUG.log('Aggiornamento avatar stato:', { status, profileAvatarFound: !!profileAvatar });
+    if (profileAvatar) {
+        profileAvatar.classList.remove('profile-avatar--loading', 'profile-avatar--success', 'profile-avatar--error');
+        if (status === APP_STATES.SUCCESS) {
+            profileAvatar.classList.add('profile-avatar--success');
+            DEBUG.log('Avatar: aggiunta classe success');
+        } else if (status === APP_STATES.LOADING) {
+            profileAvatar.classList.add('profile-avatar--loading');
+            DEBUG.log('Avatar: aggiunta classe loading');
+        } else if (status === APP_STATES.ERROR) {
+            profileAvatar.classList.add('profile-avatar--error');
+            DEBUG.log('Avatar: aggiunta classe error');
+        }
+    } else {
+        DEBUG.error('Elemento profileAvatar non trovato!');
+    }
+
     // Aggiorna stato app nelle impostazioni
     const appStatusEl = document.getElementById('appStatus');
     if (appStatusEl) {
@@ -860,7 +909,7 @@ function updateConnectionStatus(status, text) {
             appStatusEl.textContent = '🟡 Connessione...';
         }
     }
-    
+
     DEBUG.log('Stato connessione aggiornato', { status, text: displayText });
 }
 
@@ -2162,11 +2211,9 @@ function showPersonalizationMessage(type, text) {
 function updateWelcomeMessage() {
     const welcomeMessageEl = document.getElementById('welcomeMessage');
     if (welcomeMessageEl) {
-        if (AppState.userPreferences.userName) {
-            welcomeMessageEl.textContent = `Ciao ${AppState.userPreferences.userName}! 👋`;
-            welcomeMessageEl.style.display = 'block';
-        } else {
-            welcomeMessageEl.style.display = 'none';        }
+        // Nascondi sempre il messaggio di benvenuto nella pagina
+        // ora è mostrato nella top bar
+        welcomeMessageEl.style.display = 'none';
     }
 }
 
