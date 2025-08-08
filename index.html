@@ -298,20 +298,10 @@
                 <div id="message" class="message hidden"></div>
             </section>
 
-            <!-- Shared Page -->
-            <section id="sharedPage" class="page">
-                <div class="card">
-                    <div class="card-title"> <!-- 👥 Transazioni Condivise -->
-  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-  Transazioni Condivise
-</div>
-                    <div style="text-align: center; padding: 60px 20px; color: #666;">
-                        <div style="font-size: 48px; margin-bottom: 16px;">🚧</div>
-                        <div style="font-weight: 500; margin-bottom: 8px;">Sezione in costruzione</div>
-                        <div style="font-size: 14px; color: #999;">
-                            Qui potrai vedere le transazioni condivise con altri utenti
-                        </div>
-                    </div>
+            <!-- Budget Page -->
+            <section id="budgetPage" class="page">
+                <div id="budgetGrid" class="budget-grid">
+                    <!-- Budget cards render here -->
                 </div>
             </section>
 
@@ -426,9 +416,9 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon nav-icon--add" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 <span class="nav-label">Aggiungi</span>
             </button>
-            <button class="nav-item" data-page="shared">
-                <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                <span class="nav-label">Condivise</span>
+            <button class="nav-item" data-page="budget">
+                <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6"/></svg>
+                <span class="nav-label">Budget</span>
             </button>
             <button class="nav-item" data-page="settings">
                 <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 8 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 5 15.4a1.65 1.65 0 0 0-1.51-1V13a2 2 0 0 1 0-4v-.09A1.65 1.65 0 0 0 4.6 8a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 8 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09c.38.07.73.24 1 .51a1.65 1.65 0 0 0 1.82.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 8c.07.38.24.73.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-.51 1z"/></svg>
