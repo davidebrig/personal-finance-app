@@ -5,7 +5,7 @@
 // Default Configuration
 const CONFIG = {
     // URL del Google Apps Script
-    DEFAULT_GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxfWeO1t1v_udq3x2OXZKc-Ty1Qp4JDwNXUJ4BO1KpwdGo9D3pAZ7P3x0d_DF4PxMrfHQ/exec',
+    DEFAULT_GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxRjl4V6tFQEKTyACd6NvJoUc0m9vckH_hCYHXf5xFdDFCENmqB0RlEsJUIBOkyT6hT-A/exec',
     
     // ID del Google Sheet (per aprire il link diretto)
     DEFAULT_GOOGLE_SHEET_ID: '1oMGygtZxVOjoFdkXZ0Gb3oe_gQbHUy1tCzg-1YsNgk4',
@@ -37,6 +37,16 @@ const CONFIG = {
     DASHBOARD: {
         RECENT_TRANSACTIONS_LIMIT: 5,
         AUTO_REFRESH_INTERVAL: 30000 // 30 secondi
+    },
+
+    // Cache & Freshness policy (ms)
+    CACHE: {
+        TTL: {
+            INITIAL_DATA: 5 * 60 * 1000,      // 5 minuti
+            DASHBOARD_STATS: 60 * 1000,       // 1 minuto
+            TRANSACTIONS: 60 * 1000,          // 1 minuto
+            BUDGETS: 2 * 60 * 1000            // 2 minuti
+        }
     },
     
     // Impostazioni form
@@ -81,10 +91,10 @@ const PAGES = {
         icon: '',
         label: 'Aggiungi'
     },
-    shared: {
-        title: 'Condivise',
+    budget: {
+        title: 'Budget',
         icon: '',
-        label: 'Condivise'
+        label: 'Budget'
     },
     settings: {
         title: 'Impostazioni',
