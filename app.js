@@ -106,7 +106,6 @@ document.addEventListener('DOMContentLoaded', function() {
     DEBUG.log('Inizializzazione app completa...');
     
     initializeApp();
-    loadSpreadsheetData();
 });
 
 function initializeApp() {
@@ -132,9 +131,12 @@ function initializeApp() {
     changePage(initialPage, true); // true per indicare caricamento iniziale
     updateLastConnectionTime(); // Chiamato dopo il setup della pagina
     
-    // Avvia il caricamento dei dati e aggiorna lo stato di connessione
+    // Avvia il caricamento dei dati e aggiorna lo stato di connessione (una sola volta)
     DEBUG.log('Avvio caricamento dati iniziale...');
-    loadSpreadsheetData();
+    if (!initializeApp._loadedOnce) {
+        initializeApp._loadedOnce = true;
+        loadSpreadsheetData();
+    }
     
     DEBUG.log('App completa inizializzata con successo');
     console.log('✅ App inizializzazione completata!');
@@ -477,8 +479,12 @@ function handlePageChange(page) {
             if (CONFIG.FORM.AUTO_FOCUS_AMOUNT) {
                 setTimeout(() => {
                     const importoField = document.getElementById('importo');
-                    if (importoField) importoField.focus();
-                }, 100);
+                    if (importoField) {
+                        importoField.focus();
+                        // Seleziona tutto il testo per facilitare la sostituzione
+                        importoField.select();
+                    }
+                }, 150);
             }
             break;
         case 'shared':
@@ -564,25 +570,15 @@ function hideStickySubmit() {
 }
 
 function syncSubmitButtons() {
-    const originalBtn = document.getElementById('submitBtn');
     const stickyBtn = document.getElementById('submitBtnSticky');
     const tipoField = document.getElementById('tipo');
     
-    if (!originalBtn || !stickyBtn || !tipoField) return;
+    if (!stickyBtn || !tipoField) return;
     
     const tipo = tipoField.value;
     
-    // Sincronizza classi
-    stickyBtn.className = originalBtn.className;
-    
-    // Sincronizza stato disabled
-    stickyBtn.disabled = originalBtn.disabled;
-    
-    // Sincronizza testo del bottone
-    const submitText = document.getElementById('submitText');
+    // Aggiorna testo del bottone sticky
     const submitTextSticky = document.getElementById('submitTextSticky');
-    const submitSpinner = document.getElementById('submitSpinner');
-    const submitSpinnerSticky = document.getElementById('submitSpinnerSticky');
     
     if (submitTextSticky) {
         let tipoText = '';
@@ -603,16 +599,6 @@ function syncSubmitButtons() {
         if (AppState.editingTransactionId) {
             submitTextSticky.textContent = `Salva Modifiche`;
         }
-    }
-    
-    if (submitSpinner && submitSpinnerSticky) {
-        submitSpinnerSticky.style.display = submitSpinner.style.display;
-        if (submitTextSticky) {
-            submitTextSticky.style.display = submitText ? submitText.style.display : 'inline';
-        }    
-    }
-    if (submitText && AppState.editingTransactionId) {
-        submitText.textContent = 'Salva Modifiche';
     }
 }
 
@@ -949,6 +935,8 @@ async function updateMonthlyStats() {
 function displayMonthlyStats(stats) {
     const monthlyIncomeEl = document.getElementById('monthlyIncome');
     const monthlyExpensesEl = document.getElementById('monthlyExpenses');
+    const monthlyNetEl = document.getElementById('monthlyNet');
+    const monthlySpendingPctEl = document.getElementById('monthlySpendingPct');
     const savingRateEl = document.getElementById('savingRate');
     const incomeChangeEl = document.getElementById('incomeChange');
     const expenseChangeEl = document.getElementById('expenseChange');
@@ -960,6 +948,32 @@ function displayMonthlyStats(stats) {
     
     if (monthlyExpensesEl) {
         monthlyExpensesEl.textContent = NumberUtils.formatCurrency(stats.monthlyExpenses || 0);
+    }
+    
+    // Calcola e mostra Saldo del mese (Entrate - Uscite)
+    if (monthlyNetEl) {
+        const net = (stats.monthlyIncome || 0) - (stats.monthlyExpenses || 0);
+        monthlyNetEl.textContent = NumberUtils.formatCurrency(net);
+        monthlyNetEl.classList.remove('positive', 'negative');
+        monthlyNetEl.classList.add(net >= 0 ? 'positive' : 'negative');
+    }
+
+    // Calcola e mostra Percentuale di spesa (Uscite / Entrate * 100)
+    if (monthlySpendingPctEl) {
+        const income = stats.monthlyIncome || 0;
+        const expenses = stats.monthlyExpenses || 0;
+        const pct = income > 0 ? (expenses / income) * 100 : 0;
+        monthlySpendingPctEl.textContent = `${pct.toFixed(1)}%`;
+        monthlySpendingPctEl.className = 'stat-value balance-value';
+        // Colora in base alla soglia (verde < 50%, arancione 50-80%, rosso > 80%)
+        if (pct > 80) {
+            monthlySpendingPctEl.classList.add('negative');
+        } else if (pct > 50) {
+            // usa color-warning via inline style per evidenziare
+            monthlySpendingPctEl.style.color = 'var(--color-warning)';
+        } else {
+            monthlySpendingPctEl.classList.add('positive');
+        }
     }
     
     // Calcola e mostra Saving Rate
@@ -1263,11 +1277,9 @@ function initializeTransactionForm() {
 }
 
 function showSubmitButton() {
-    const submitBtn = document.getElementById('submitBtn');
-    if (submitBtn) {
-        submitBtn.classList.remove('hidden');
-        DEBUG.log('Submit button mostrato');
-    }
+    // Il bottone sticky è sempre visibile sulla pagina addTransaction
+    // Questa funzione è mantenuta per compatibilità
+    DEBUG.log('Submit button mostrato (sticky)');
 }
 
 function populateFormSelects() {
@@ -1364,33 +1376,30 @@ function populateCategorySelects(filterTipo = null) {
 
 function updateButtonStyles() {
     const tipoField = document.getElementById('tipo');
-    const submitBtn = document.getElementById('submitBtn');
     const submitBtnSticky = document.getElementById('submitBtnSticky');
     
     if (!tipoField) return;
     
     const tipo = tipoField.value;
     
-    // Aggiorna entrambi i bottoni
-    [submitBtn, submitBtnSticky].forEach(btn => {
-        if (btn) {
-            // Rimuovi tutte le classi di tipo
-            btn.classList.remove('btn--expense', 'btn--income', 'btn--transfer');
-            
-            // Aggiungi la classe corrente
-            switch(tipo) {
-                case TRANSACTION_TYPES.EXPENSE:
-                    btn.classList.add('btn--expense');
-                    break;
-                case TRANSACTION_TYPES.INCOME:
-                    btn.classList.add('btn--income');
-                    break;
-                case TRANSACTION_TYPES.TRANSFER:
-                    btn.classList.add('btn--transfer');
-                    break;
-            }
+    // Aggiorna solo il bottone sticky
+    if (submitBtnSticky) {
+        // Rimuovi tutte le classi di tipo
+        submitBtnSticky.classList.remove('btn--expense', 'btn--income', 'btn--transfer');
+        
+        // Aggiungi la classe corrente
+        switch(tipo) {
+            case TRANSACTION_TYPES.EXPENSE:
+                submitBtnSticky.classList.add('btn--expense');
+                break;
+            case TRANSACTION_TYPES.INCOME:
+                submitBtnSticky.classList.add('btn--income');
+                break;
+            case TRANSACTION_TYPES.TRANSFER:
+                submitBtnSticky.classList.add('btn--transfer');
+                break;
         }
-    });
+    }
     
     // Sincronizza i bottoni
     if (AppState.currentPage === 'addTransaction') {
@@ -1667,13 +1676,9 @@ function initializeAutocomplete() {
 function handleFormSubmit(e) {
     e.preventDefault();
     
-    const submitBtn = document.getElementById('submitBtn'); // Bottone originale nel form
-    const originalSubmitTextEl = document.getElementById('submitText'); // Testo del bottone originale
-    const originalSubmitSpinnerEl = document.getElementById('submitSpinner'); // Spinner del bottone originale
-
-    // Usa il bottone sticky per i riferimenti se il bottone originale non è visibile (improbabile ma per sicurezza)
-    const effectiveSubmitTextEl = originalSubmitTextEl || document.getElementById('submitTextSticky');
-    const effectiveSubmitSpinnerEl = originalSubmitSpinnerEl || document.getElementById('submitSpinnerSticky');
+    // Usa solo il bottone sticky
+    const effectiveSubmitTextEl = document.getElementById('submitTextSticky');
+    const effectiveSubmitSpinnerEl = document.getElementById('submitSpinnerSticky');
 
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
@@ -1762,12 +1767,32 @@ function handleFormSubmit(e) {
                  }
             }
 
+            // Submit con UI ottimistica
             submitEditTransactionOnServer(AppState.editingTransactionId, updatedTransactionData, effectiveSubmitTextEl, effectiveSubmitSpinnerEl);
 
         } else {
             // Modalità Aggiunta
             const transactions = createTransactions(data);
-            submitTransactions(transactions, effectiveSubmitTextEl, effectiveSubmitSpinnerEl);
+            // Genera ID lato client per UI ottimistica
+            const optimisticTransactions = transactions.map(t => ({
+                ID: generateLocalId(),
+                ...t
+            }));
+            // Aggiorna UI immediatamente (lista recenti e transazioni) senza attendere roundtrip
+            try {
+                AppState.datiSpreadsheet.transazioni = (AppState.datiSpreadsheet.transazioni || []);
+                AppState.datiSpreadsheet.transazioni.push(...optimisticTransactions);
+                if (AppState.currentPage === 'dashboard') {
+                    updateRecentTransactions();
+                    updateAccountBalances();
+                }
+                if (AppState.currentPage === 'transaction') {
+                    updateTransactionsPage();
+                }
+            } catch (uiError) {
+                DEBUG.warn('Errore aggiornamento UI ottimistica', uiError);
+            }
+            submitTransactions(optimisticTransactions, effectiveSubmitTextEl, effectiveSubmitSpinnerEl);
         }
     } catch (error) {
         DEBUG.error('Errore nella creazione della transazione', error);
@@ -1921,11 +1946,8 @@ function createTransactions(data) {
 }
 
 function setSubmitButtonsLoading(isLoading, submitTextEl, submitSpinnerEl) {
-    const submitBtn = document.getElementById('submitBtn');
     const submitBtnSticky = document.getElementById('submitBtnSticky');
-    [submitBtn, submitBtnSticky].forEach(btn => {
-        if (btn) btn.disabled = isLoading;
-    });
+    if (submitBtnSticky) submitBtnSticky.disabled = isLoading;
     if (submitTextEl) submitTextEl.style.display = isLoading ? 'none' : 'inline';
     if (submitSpinnerEl) {
         submitSpinnerEl.style.display = isLoading ? 'inline-block' : 'none';
@@ -1934,25 +1956,19 @@ function setSubmitButtonsLoading(isLoading, submitTextEl, submitSpinnerEl) {
 }
 
 function enableSubmitButtons() {
-    const submitBtn = document.getElementById('submitBtn');
     const submitBtnSticky = document.getElementById('submitBtnSticky');
-    [submitBtn, submitBtnSticky].forEach(btn => {
-        if (btn) btn.disabled = false;
-    });
+    if (submitBtnSticky) submitBtnSticky.disabled = false;
 }
 
 function disableSubmitButtons() {
-    const submitBtn = document.getElementById('submitBtn');
     const submitBtnSticky = document.getElementById('submitBtnSticky');
-    [submitBtn, submitBtnSticky].forEach(btn => {
-        if (btn) btn.disabled = true;
-    });
+    if (submitBtnSticky) submitBtnSticky.disabled = true;
 }
 
 async function submitTransactions(transactions, submitTextEl, submitSpinnerEl) {
     AppState.isLoading = true;
     setSubmitButtonsLoading(true, submitTextEl, submitSpinnerEl);
-    showGlobalLoading();
+    // Niente overlay globale per massimizzare la percezione di velocità
     showMessage('loading', 'Registrazione in corso...');
     const formData = new URLSearchParams();
     formData.append('action', 'addTransaction');
@@ -1969,10 +1985,10 @@ async function submitTransactions(transactions, submitTextEl, submitSpinnerEl) {
             if (CONFIG.FORM.RESET_AFTER_SUBMIT) {
                 resetTransactionForm();
             }
-            // Ricarica i dati per aggiornare i saldi e dashboard
+            // Ricarica i dati in background per allineare ID reali e saldi
             setTimeout(() => {
                 loadSpreadsheetData();
-            }, 1000);
+            }, 300);
             DEBUG.log('Transazioni registrate con successo', data);
         } else {
             throw new Error(data.message || 'Errore sconosciuto');
@@ -1983,7 +1999,7 @@ async function submitTransactions(transactions, submitTextEl, submitSpinnerEl) {
     } finally {
         AppState.isLoading = false;
         setSubmitButtonsLoading(false, submitTextEl, submitSpinnerEl);
-        hideGlobalLoading();
+        // nessun overlay globale da nascondere qui
     }
 }
 
@@ -2060,10 +2076,9 @@ function resetTransactionForm() {
     const cancelEditBtn = document.getElementById('cancelEditBtn');
     if (cancelEditBtn) cancelEditBtn.classList.add('hidden');
 
-    // Ripristina il testo originale dei bottoni submit
-    const submitText = document.getElementById('submitText');
-    if (submitText) submitText.textContent = 'Salva Transazione'; // Testo di default
-    // syncSubmitButtons() verrà chiamato da updateButtonStyles e si occuperà del bottone sticky
+    // Ripristina il testo originale del bottone sticky
+    const submitTextSticky = document.getElementById('submitTextSticky');
+    if (submitTextSticky) submitTextSticky.textContent = 'Salva Transazione'; // Testo di default
 
     updateFieldVisibility();
     updateButtonStyles();
@@ -2100,10 +2115,10 @@ function initiateEditTransaction(transactionId) {
     setTimeout(() => {
         populateFormForEdit(transactionToEdit);
         
-        // Aggiorna testo bottoni submit
-        const submitText = document.getElementById('submitText');
-        if (submitText) submitText.textContent = 'Salva Modifiche';
-        syncSubmitButtons(); // Assicura che anche il bottone sticky sia aggiornato
+        // Aggiorna testo bottone sticky
+        const submitTextSticky = document.getElementById('submitTextSticky');
+        if (submitTextSticky) submitTextSticky.textContent = 'Salva Modifiche';
+        syncSubmitButtons(); // Assicura che il bottone sticky sia aggiornato
 
         // Mostra bottone "Annulla Modifica"
         const cancelEditBtn = document.getElementById('cancelEditBtn');
@@ -2343,3 +2358,10 @@ window.syncSubmitButtons = syncSubmitButtons;
 window.initiateEditTransaction = initiateEditTransaction; // Esponi globalmente
 window.confirmDeleteTransaction = confirmDeleteTransaction; // Esponi globalmente
 window.cancelEditMode = cancelEditMode; // Esponi globalmente
+
+// ===============================================
+// PERFORMANCE/ID UTILITIES
+// ===============================================
+function generateLocalId() {
+    return `${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`;
+}
