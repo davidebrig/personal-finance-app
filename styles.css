@@ -208,6 +208,7 @@
   justify-content: space-between;
   gap: var(--space-md);
   width: 100%;
+  height: 100%;
 }
 
 /* Header title with icon */
@@ -220,6 +221,7 @@
   margin: 0;
   color: var(--color-text);
   letter-spacing: -0.01em;
+  line-height: 1;
 }
 
 /* Centra il titolo quando siamo nella dashboard */
@@ -236,16 +238,16 @@
   align-items: center;
   gap: var(--space-sm);
   margin-left: auto;
+  height: 100%;
 }
 
 .header-title, h1 {
     font-size: var(--font-size-xl);
     font-weight: var(--font-weight-semibold);
     line-height: var(--line-height-tight);
-    margin: 0 0 var(--space-lg) 0;
+    margin: 0;
     color: var(--color-text);
     letter-spacing: -0.01em;
-    text-align: center;
   }
   
   h2, .card-title {
@@ -401,7 +403,10 @@
   }
   
   .section-title {
-    margin-bottom: var(--space-xl);
+    margin: var(--space-md) 0 var(--space-md);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text);
   }
   
   /* ===============================================
@@ -409,7 +414,7 @@
      =============================================== */
   .dashboard-grid {
     display: grid;
-    gap: var(--space-lg);
+    gap: var(--space-sm);
     width: 100%;
   }
   
@@ -535,6 +540,23 @@
     align-items: center;
     gap: var(--space-md);
     padding: var(--space-lg);
+  }
+
+  /* Tighter spacing between dashboard stat blocks (income, expense, net, spending, saving rate) */
+  .dashboard-grid .stats-grid {
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+  }
+  .dashboard-grid .stat-card {
+    margin-bottom: var(--space-xs);
+  }
+  .dashboard-grid .saving-rate-card {
+    margin-bottom: var(--space-2xl);
+  }
+
+  /* Keep larger spacing after Net Worth only */
+  .dashboard-grid .balance-card {
+    margin-bottom: var(--space-xl);
   }
   
   .stat-card--income {
@@ -875,7 +897,7 @@
   }
   
   .tipo-btn {
-    padding: var(--space-lg);
+    padding: var(--space-md);
     border: 1.5px solid #444444;
     background-color: var(--color-surface);
     color: var(--color-text);
@@ -883,15 +905,16 @@
     cursor: pointer;
     transition: all var(--transition-normal);
     text-align: center;
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
-    min-height: 48px;
+    min-height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: inherit;
     position: relative;
     overflow: hidden;
+    gap: var(--space-xs);
   }
   
   .tipo-btn--readonly {
@@ -939,7 +962,7 @@
     padding: var(--space-md);
     border: 1.5px solid var(--color-border);
     border-radius: var(--radius-md);
-    background-color: #2B2B2B;
+    background-color: var(--color-surface);
     align-items: center;
   }
   
@@ -978,6 +1001,11 @@
     padding: var(--space-xs);
     font-family: inherit;
     color: var(--color-text);
+  }
+  
+  .tags-input::placeholder {
+    color: var(--color-text-light);
+    opacity: 0.7;
   }
   
   /* ===============================================
@@ -1320,13 +1348,11 @@
     left: 0;
     right: 0;
     width: 100%;
-    padding: var(--space-lg);
+    padding: var(--space-md) var(--space-lg);
     z-index: 35;
-    background: rgba(30, 30, 30, 0.9);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: #ffffff;
     border-top: 1px solid var(--color-border);
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1), 0 -1px 3px rgba(0, 0, 0, 0.05);
     display: none;
   }
   
@@ -1346,12 +1372,17 @@
     margin: 0;
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
-    min-height: 48px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    min-height: 52px;
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-normal);
   }
   
   .sticky-submit .btn--submit:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25), 0 3px 6px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
   }
   
   /* ===============================================
@@ -1959,6 +1990,7 @@
     opacity: 0.6;
     transition: all var(--transition-normal);
     position: relative;
+    flex-shrink: 0;
   }
   
   .profile-avatar img {
@@ -2011,6 +2043,7 @@
     background: transparent;
     border: none;
     transition: all var(--transition-normal);
+    height: 100%;
   }
   
   /* Hover effects for better UX */
